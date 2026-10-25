@@ -1,0 +1,96 @@
+<template>
+    <template lwc:if={hasCard}>
+        <article class="pp-card">
+            <header class="pp-header">
+                <div class="pp-avatar"><lightning-icon icon-name="standard:event" size="small" variant="inverse"></lightning-icon></div>
+                <div class="pp-heading">
+                    <h2 class="pp-title">{card.title}</h2>
+                    <template lwc:if={card.subtitle}><p class="pp-sub">{card.subtitle}</p></template>
+                </div>
+                <template lwc:if={card.badge}><span class={badgeClass}>{card.badge}</span></template>
+            </header>
+            <template lwc:if={card.headline}><p class="pp-headline">{card.headline}</p></template>
+
+            <template lwc:if={hasProposal}>
+                <div class="pp-metrics">
+                    <template for:each={metrics} for:item="m">
+                        <div key={m.key} class={m.cls}><span class="pp-metric-label">{m.label}</span><span class="pp-metric-value">{m.value}</span></div>
+                    </template>
+                </div>
+                <dl class="ep-facts">
+                    <template for:each={facts} for:item="f">
+                        <div key={f.key} class="ep-fact"><dt>{f.label}</dt><dd>{f.value}</dd></div>
+                    </template>
+                </dl>
+                <section class="pp-block">
+                    <h3 class="pp-block-heading">Estimated expenses</h3>
+                    <ul class="ep-exp">
+                        <template for:each={expenses} for:item="x">
+                            <li key={x.key}><span>{x.label}<span class="ep-exp-type"> {x.type}</span></span><span class="ep-amt">{x.amount}</span></li>
+                        </template>
+                    </ul>
+                </section>
+                <section class="pp-block">
+                    <h3 class="pp-block-heading">Compliance preflight</h3>
+                    <ul class="ep-checks">
+                        <template for:each={checks} for:item="k">
+                            <li key={k.key} class={k.cls}>
+                                <lightning-icon icon-name={k.icon} size="xx-small"></lightning-icon>
+                                <span><strong>{k.label}.</strong> {k.detail}</span>
+                            </li>
+                        </template>
+                    </ul>
+                </section>
+                <template lwc:if={showCreate}>
+                    <section class="pp-block ep-edit">
+                        <h3 class="pp-block-heading">Adjust before creating</h3>
+                        <div class="ep-edit-row">
+                            <label>Start date<input type="date" data-field="startDate" value={card.startDate} onchange={handleEdit} disabled={busy}/></label>
+                            <label>Attendees<input type="number" min="1" data-field="attendees" value={card.attendees} onchange={handleEdit} disabled={busy}/></label>
+                        </div>
+                    </section>
+                </template>
+            </template>
+
+            <template for:each={sections} for:item="s">
+                <section key={s.key} class="pp-block">
+                    <h3 class="pp-block-heading">{s.heading}</h3>
+                    <ul class="pp-bullets"><template for:each={s.bullets} for:item="b"><li key={b.key}>{b.text}</li></template></ul>
+                </section>
+            </template>
+            <template lwc:if={hasOptions}>
+                <section class="pp-block">
+                    <h3 class="pp-block-heading">Other formats considered</h3>
+                    <ul class="pp-bullets">
+                        <template for:each={options} for:item="o">
+                            <li key={o.key}><strong>{o.eventType}</strong> ({o.meta}): {o.why}</li>
+                        </template>
+                    </ul>
+                </section>
+            </template>
+            <template lwc:if={card.nextStep}>
+                <div class="pp-next">
+                    <lightning-icon icon-name="utility:target" size="xx-small"></lightning-icon>
+                    <div><span class="pp-next-label">Next step</span><span class="pp-next-value">{card.nextStep}</span></div>
+                </div>
+            </template>
+
+            <template lwc:if={showCreate}>
+                <div class="pp-actions">
+                    <button class="pp-btn ep-create" disabled={createDisabled} onclick={handleCreate}>{createLabel}</button>
+                </div>
+            </template>
+            <template lwc:if={created}>
+                <div class="ep-done">
+                    <p class="ep-done-text">{createdText}</p>
+                    <div class="pp-actions">
+                        <button class="pp-btn" onclick={handleOpen}>Open event</button>
+                        <button class="pp-btn pp-btn-escalate" disabled={undoDisabled} onclick={handleUndo}>Undo (cancel draft)</button>
+                    </div>
+                </div>
+            </template>
+            <template lwc:if={message}><p class="pp-message">{message}</p></template>
+        </article>
+    </template>
+    <template lwc:else><div class="pp-empty">Nothing to show yet.</div></template>
+</template>

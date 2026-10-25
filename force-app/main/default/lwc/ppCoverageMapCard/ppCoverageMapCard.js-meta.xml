@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>68.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>PP Coverage Map</masterLabel>
+    <description>Renders the PP Coverage Map custom Lightning type: stakeholder network with relationship-strength rings and coverage gaps.</description>
+    <targets>
+        <target>lightning__AgentforceOutput</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__AgentforceOutput">
+            <sourceType name="c__ppCoverageMap"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

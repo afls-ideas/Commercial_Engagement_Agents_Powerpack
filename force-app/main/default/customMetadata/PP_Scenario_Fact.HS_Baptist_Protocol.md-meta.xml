@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>HS Baptist Protocol</label>
+    <protected>false</protected>
+    <values>
+        <field>Account_Name__c</field>
+        <value xsi:type="xsd:string">Baptist Health South Florida</value>
+    </values>
+    <values>
+        <field>Category__c</field>
+        <value xsi:type="xsd:string">Protocol</value>
+    </values>
+    <values>
+        <field>Fact__c</field>
+        <value xsi:type="xsd:string">Demo protocol: Baptist Health Cancer Institute Clinical Pathway 2026. Immunonco is PREFERRED for 4L+ RRMM after a 2026-06 committee vote; adoption work is now operational (REMS enrollment of centers, bed capacity).</value>
+    </values>
+    <values>
+        <field>Persona__c</field>
+        <value xsi:type="xsd:string">health_system</value>
+    </values>
+</CustomMetadata>

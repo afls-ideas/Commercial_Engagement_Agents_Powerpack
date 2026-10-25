@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>EV Type 2</label>
+    <protected>false</protected>
+    <values>
+        <field>Category__c</field>
+        <value xsi:type="xsd:string">Event type guide</value>
+    </values>
+    <values>
+        <field>Fact__c</field>
+        <value xsi:type="xsd:string">TYPE GUIDE: Advisory Board = about 50 attendees, about $68K, 1 day, to gather expert input before a launch or pathway decision. Webinar = virtual, low cost (platform plus speaker fee), best to reach many HCPs outside the territory.</value>
+    </values>
+    <values>
+        <field>Persona__c</field>
+        <value xsi:type="xsd:string">events</value>
+    </values>
+</CustomMetadata>

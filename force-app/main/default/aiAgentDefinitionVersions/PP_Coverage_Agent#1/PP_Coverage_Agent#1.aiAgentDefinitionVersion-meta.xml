@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AiAgentDefinitionVersion xmlns="http://soap.sforce.com/2006/04/metadata">
+    <articleAnswersGPTEnabled>false</articleAnswersGPTEnabled>
+    <billingMode>ActionBased</billingMode>
+    <citationsEnabled>false</citationsEnabled>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The agent instructions</description>
+        <developerName>AgentScriptInternal_agent_instructions</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Agent Instructions</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The next topic to be visited</description>
+        <developerName>AgentScriptInternal_next_topic</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Next Topic</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The record ID from the current page context</description>
+        <developerName>record_id</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Record Id</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <copilotPrimaryLanguage>en_US</copilotPrimaryLanguage>
+    <genAiPlannerName>PP_Coverage_Agent_v1</genAiPlannerName>
+    <isScriptCompatibleAgent>true</isScriptCompatibleAgent>
+    <knowledgeActionEnabled>false</knowledgeActionEnabled>
+    <knowledgeFallbackEnabled>false</knowledgeFallbackEnabled>
+    <planner>
+        <fullName>PP_Coverage_Agent_v1</fullName>
+        <agentGraphRef>20ZgL00000BCfx7</agentGraphRef>
+        <description>Employee agent for KAMs: stakeholder coverage and relationship health as an org-chart network with strength rings and coverage gaps</description>
+        <localTopicLinks>
+            <genAiPluginName>account_qa</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>agent_router</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>ambiguous_question</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>compliance_check</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>coverage_map</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>off_topic</genAiPluginName>
+        </localTopicLinks>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Answer general questions about an account or HCP using visit history, messages and insights</description>
+            <genAiPluginInstructions>
+                <description>You are the relationship-intelligence partner for a commercial key account manager. You show who sits where in an account, how strong each relationship is, who has gone quiet and who has never been reached, and you suggest compliant outreach through approved channels only.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002wSAs</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002wSAs</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>ask_about_account</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Ask any question about an account or HCP. Gathers sales context and returns an AI-generated summary.</description>
+                <invocationTarget>FSRAskAboutAccountAction</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>ask_about_account</localDeveloperName>
+                <masterLabel>Ask About Account</masterLabel>
+            </localActions>
+            <localDeveloperName>account_qa</localDeveloperName>
+            <masterLabel>Account Qa</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Route the user to the appropriate topic</description>
+            <genAiPluginInstructions>
+                <description>You are the relationship-intelligence partner for a commercial key account manager. You show who sits where in an account, how strong each relationship is, who has gone quiet and who has never been reached, and you suggest compliant outreach through approved channels only.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002wSAw</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002wSAw</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>agent_router</localDeveloperName>
+            <masterLabel>Agent Router</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Ask for clarification when the request is unclear</description>
+            <genAiPluginInstructions>
+                <description>You are the relationship-intelligence partner for a commercial key account manager. You show who sits where in an account, how strong each relationship is, who has gone quiet and who has never been reached, and you suggest compliant outreach through approved channels only.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002wSAt</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002wSAt</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>ambiguous_question</localDeveloperName>
+            <masterLabel>Ambiguous Question</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Classify a question as on-label, off-label, adverse event or promotional claim and give the compliant way to respond</description>
+            <genAiPluginInstructions>
+                <description>You are the relationship-intelligence partner for a commercial key account manager. You show who sits where in an account, how strong each relationship is, who has gone quiet and who has never been reached, and you suggest compliant outreach through approved channels only.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002wSAu</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002wSAu</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>check</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Classifies the question and returns the compliant response and escalation steps.</description>
+                <invocationTarget>PPComplianceAction</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>check</localDeveloperName>
+                <masterLabel>Check</masterLabel>
+            </localActions>
+            <localDeveloperName>compliance_check</localDeveloperName>
+            <masterLabel>Compliance Check</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Show an account&apos;s stakeholder network with relationship strength, last contact and coverage gaps</description>
+            <genAiPluginInstructions>
+                <description>You are the relationship-intelligence partner for a commercial key account manager. You show who sits where in an account, how strong each relationship is, who has gone quiet and who has never been reached, and you suggest compliant outreach through approved channels only.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002wSAr</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002wSAr</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>build_card</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Returns the stakeholder network for an account with relationship strength, days since contact and coverage gaps. The output is always renderable; always use show_command to display it.</description>
+                <invocationTarget>PPCoverageMapAction</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+                <localDeveloperName>build_card</localDeveloperName>
+                <masterLabel>Build Card</masterLabel>
+                <progressIndicatorMessage>Building your Stakeholder Coverage...</progressIndicatorMessage>
+            </localActions>
+            <localDeveloperName>coverage_map</localDeveloperName>
+            <masterLabel>Coverage Map</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Redirect off-topic requests</description>
+            <genAiPluginInstructions>
+                <description>You are the relationship-intelligence partner for a commercial key account manager. You show who sits where in an account, how strong each relationship is, who has gone quiet and who has never been reached, and you suggest compliant outreach through approved channels only.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002wSAv</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002wSAv</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>off_topic</localDeveloperName>
+            <masterLabel>Off Topic</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <masterLabel>PP Coverage Agent</masterLabel>
+        <plannerType>Atlas__ConcurrentMultiAgentOrchestration</plannerType>
+    </planner>
+    <smallTalkEnabled>false</smallTalkEnabled>
+    <staticPromptsEnabled>false</staticPromptsEnabled>
+    <status>Inactive</status>
+    <stopRecPrompts>false</stopRecPrompts>
+    <surfacesEnabled>false</surfacesEnabled>
+    <toneType>Casual</toneType>
+    <version>1</version>
+    <welcomeMessage>Hi! I&apos;m your relationship-coverage partner. Ask me who you haven&apos;t spoken to recently at an account, or where your coverage is thin.</welcomeMessage>
+</AiAgentDefinitionVersion>

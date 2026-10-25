@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>WS Guidance p2</label>
+    <protected>false</protected>
+    <values>
+        <field>Category__c</field>
+        <value xsi:type="xsd:string">Plan guidance</value>
+    </values>
+    <values>
+        <field>Fact__c</field>
+        <value xsi:type="xsd:string">(continued) Defend = high potential, high share; Develop = low potential and low share, invest selectively; Maintain = low potential, high share. Whitespace work must stay on label and inside approved channels; access barriers go to Market Access.</value>
+    </values>
+    <values>
+        <field>Persona__c</field>
+        <value xsi:type="xsd:string">whitespace</value>
+    </values>
+</CustomMetadata>

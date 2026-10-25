@@ -1,0 +1,14 @@
+{
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "card" : {
+      "title" : "Health System Protocol",
+      "description" : "The structured Health System Protocol. The output is always renderable; always use show_command to display it to the user.",
+      "lightning:type" : "c__ppHealthSystemProtocol",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : true,
+      "copilotAction:isUsedByPlanner" : true
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

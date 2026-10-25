@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>WS Atrium</label>
+    <protected>false</protected>
+    <values>
+        <field>Account_Name__c</field>
+        <value xsi:type="xsd:string">Atrium</value>
+    </values>
+    <values>
+        <field>Category__c</field>
+        <value xsi:type="xsd:string">Account potential</value>
+    </values>
+    <values>
+        <field>Fact__c</field>
+        <value xsi:type="xsd:string">ACCOUNT: Atrium | SEGMENT: IDN | POTENTIAL: 80 | SHARE: 22 | REVENUE: 900 | WHITESPACE: Academic centre myeloma programme and the regional network of 6 community sites. | BARRIER: Competitor on preferred protocol.</value>
+    </values>
+    <values>
+        <field>Persona__c</field>
+        <value xsi:type="xsd:string">whitespace</value>
+    </values>
+</CustomMetadata>

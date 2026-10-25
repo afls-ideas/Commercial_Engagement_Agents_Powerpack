@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Cardio Medicaid</label>
+    <protected>false</protected>
+    <values>
+        <field>Category__c</field>
+        <value xsi:type="xsd:string">Access</value>
+    </values>
+    <values>
+        <field>Fact__c</field>
+        <value xsi:type="xsd:string">Medicaid formulary (demo): Mississippi and Alabama Medicaid cover Cardivex with a simple prior-authorization form for HFrEF; typical approval time 2 business days. Commercial plans mostly Tier 3.</value>
+    </values>
+    <values>
+        <field>Persona__c</field>
+        <value xsi:type="xsd:string">cardio_regional</value>
+    </values>
+</CustomMetadata>

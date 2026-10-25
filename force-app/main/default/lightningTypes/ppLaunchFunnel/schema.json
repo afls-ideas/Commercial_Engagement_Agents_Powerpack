@@ -1,0 +1,5 @@
+{
+  "title": "PP Launch Funnel",
+  "description": "PP Launch Funnel card rendered in a Power Pack Agentforce agent.",
+  "lightning:type": "@apexClassType/c__PPCard"
+}

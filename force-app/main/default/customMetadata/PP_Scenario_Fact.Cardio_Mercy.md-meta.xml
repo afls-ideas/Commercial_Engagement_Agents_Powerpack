@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Cardio Mercy</label>
+    <protected>false</protected>
+    <values>
+        <field>Account_Name__c</field>
+        <value xsi:type="xsd:string">Mercy Hospital</value>
+    </values>
+    <values>
+        <field>Category__c</field>
+        <value xsi:type="xsd:string">Account status</value>
+    </values>
+    <values>
+        <field>Fact__c</field>
+        <value xsi:type="xsd:string">Demo status: 340B-eligible community hospital with a heart failure outpatient clinic; contract pharmacy in the county; about 200 HFrEF patients, GDMT use unknown. Account type: Community Health Center / hospital clinic.</value>
+    </values>
+    <values>
+        <field>Persona__c</field>
+        <value xsi:type="xsd:string">cardio_regional</value>
+    </values>
+</CustomMetadata>

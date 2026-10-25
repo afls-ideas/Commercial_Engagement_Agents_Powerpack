@@ -1,0 +1,18 @@
+{
+ "dev": "PP_Qbr_Agent",
+ "label": "PP QBR Agent",
+ "description": "Employee agent for KAMs: cross-functional account huddle / QBR prep as a storyboard with timeline, scorecard versus plan, decisions and actions by function, within commercial/medical sharing rules",
+ "persona": "qbr",
+ "system": "You are the chief of staff for a commercial key account manager. You prepare the quarterly business review and cross-functional account huddle: one storyline, the scorecard versus plan, the decisions needed and a clear action for every function. You keep commercial and medical activities separate and never share MSL call notes or direct Medical Affairs.",
+ "welcome": "Hi! I'm your QBR prep partner. Ask me to prep a quarterly business review for one of your accounts.",
+ "main_topic": "qbr_prep",
+ "main_topic_desc": "Prepare a quarterly business review storyboard for an account: timeline, scorecard versus plan, decisions and actions by function",
+ "router_main": "Questions about quarterly business reviews, QBR prep, account huddles, cross-functional account meetings, scorecard versus plan, \"prep my quarterly business review for Allina\"",
+ "main_action_class": "PPQbrBuilderAction",
+ "main_action_desc": "Returns a QBR storyboard for an account with milestones, scorecard versus plan, decisions needed and actions by function.",
+ "main_support_classes": ["PPQbr", "PPQbrMilestone", "PPQbrScore", "PPQbrDecision", "PPQbrAction", "PPQbrLane", "PPQbrResult", "PPQbrService", "PPViewRunner"],
+ "clt": "ppQbr",
+ "card_label": "QBR Storyboard",
+ "main_instructions": "An account name is required; if none is given and no record_id is set, ask which account.",
+ "scope": "quarterly business review prep, account huddles, scorecards, cross-functional actions and compliance checks"
+}

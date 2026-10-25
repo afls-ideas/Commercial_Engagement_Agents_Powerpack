@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Medtech ElCamino p2</label>
+    <protected>false</protected>
+    <values>
+        <field>Account_Name__c</field>
+        <value xsi:type="xsd:string">El Camino Health</value>
+    </values>
+    <values>
+        <field>Category__c</field>
+        <value xsi:type="xsd:string">VAC status</value>
+    </values>
+    <values>
+        <field>Fact__c</field>
+        <value xsi:type="xsd:string">(continued) Cath lab consignment: 23 mm x3, 26 mm x4, 29 mm x2, last counted 5 days ago.</value>
+    </values>
+    <values>
+        <field>Persona__c</field>
+        <value xsi:type="xsd:string">medtech_cath</value>
+    </values>
+</CustomMetadata>

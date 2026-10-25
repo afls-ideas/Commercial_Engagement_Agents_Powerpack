@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AiAgentDefinitionVersion xmlns="http://soap.sforce.com/2006/04/metadata">
+    <articleAnswersGPTEnabled>false</articleAnswersGPTEnabled>
+    <billingMode>ActionBased</billingMode>
+    <citationsEnabled>false</citationsEnabled>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The agent instructions</description>
+        <developerName>AgentScriptInternal_agent_instructions</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Agent Instructions</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The next topic to be visited</description>
+        <developerName>AgentScriptInternal_next_topic</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Next Topic</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The record ID from the current page context</description>
+        <developerName>record_id</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Record Id</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <copilotPrimaryLanguage>en_US</copilotPrimaryLanguage>
+    <genAiPlannerName>PP_Qbr_Agent_v1</genAiPlannerName>
+    <isScriptCompatibleAgent>true</isScriptCompatibleAgent>
+    <knowledgeActionEnabled>false</knowledgeActionEnabled>
+    <knowledgeFallbackEnabled>false</knowledgeFallbackEnabled>
+    <planner>
+        <fullName>PP_Qbr_Agent_v1</fullName>
+        <agentGraphRef>20ZgL00000BCgUz</agentGraphRef>
+        <description>Employee agent for KAMs: cross-functional account huddle / QBR prep as a storyboard with timeline, scorecard versus plan, decisions and actions by function, within commercial/medical sharing rules</description>
+        <localTopicLinks>
+            <genAiPluginName>account_qa</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>agent_router</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>ambiguous_question</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>compliance_check</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>off_topic</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>qbr_prep</genAiPluginName>
+        </localTopicLinks>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Answer general questions about an account or HCP using visit history, messages and insights</description>
+            <genAiPluginInstructions>
+                <description>You are the chief of staff for a commercial key account manager. You prepare the quarterly business review and cross-functional account huddle: one storyline, the scorecard versus plan, the decisions needed and a clear action for every function. You keep commercial and medical activities separate and never share MSL call notes or direct Medical Affairs.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002wSKX</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002wSKX</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>ask_about_account</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Ask any question about an account or HCP. Gathers sales context and returns an AI-generated summary.</description>
+                <invocationTarget>FSRAskAboutAccountAction</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>ask_about_account</localDeveloperName>
+                <masterLabel>Ask About Account</masterLabel>
+            </localActions>
+            <localDeveloperName>account_qa</localDeveloperName>
+            <masterLabel>Account Qa</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Route the user to the appropriate topic</description>
+            <genAiPluginInstructions>
+                <description>You are the chief of staff for a commercial key account manager. You prepare the quarterly business review and cross-functional account huddle: one storyline, the scorecard versus plan, the decisions needed and a clear action for every function. You keep commercial and medical activities separate and never share MSL call notes or direct Medical Affairs.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002wSKb</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002wSKb</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>agent_router</localDeveloperName>
+            <masterLabel>Agent Router</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Ask for clarification when the request is unclear</description>
+            <genAiPluginInstructions>
+                <description>You are the chief of staff for a commercial key account manager. You prepare the quarterly business review and cross-functional account huddle: one storyline, the scorecard versus plan, the decisions needed and a clear action for every function. You keep commercial and medical activities separate and never share MSL call notes or direct Medical Affairs.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002wSKa</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002wSKa</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>ambiguous_question</localDeveloperName>
+            <masterLabel>Ambiguous Question</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Classify a question as on-label, off-label, adverse event or promotional claim and give the compliant way to respond</description>
+            <genAiPluginInstructions>
+                <description>You are the chief of staff for a commercial key account manager. You prepare the quarterly business review and cross-functional account huddle: one storyline, the scorecard versus plan, the decisions needed and a clear action for every function. You keep commercial and medical activities separate and never share MSL call notes or direct Medical Affairs.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002wSKY</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002wSKY</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>check</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Classifies the question and returns the compliant response and escalation steps.</description>
+                <invocationTarget>PPComplianceAction</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>check</localDeveloperName>
+                <masterLabel>Check</masterLabel>
+            </localActions>
+            <localDeveloperName>compliance_check</localDeveloperName>
+            <masterLabel>Compliance Check</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Redirect off-topic requests</description>
+            <genAiPluginInstructions>
+                <description>You are the chief of staff for a commercial key account manager. You prepare the quarterly business review and cross-functional account huddle: one storyline, the scorecard versus plan, the decisions needed and a clear action for every function. You keep commercial and medical activities separate and never share MSL call notes or direct Medical Affairs.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002wSKc</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002wSKc</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>off_topic</localDeveloperName>
+            <masterLabel>Off Topic</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Prepare a quarterly business review storyboard for an account: timeline, scorecard versus plan, decisions and actions by function</description>
+            <genAiPluginInstructions>
+                <description>You are the chief of staff for a commercial key account manager. You prepare the quarterly business review and cross-functional account huddle: one storyline, the scorecard versus plan, the decisions needed and a clear action for every function. You keep commercial and medical activities separate and never share MSL call notes or direct Medical Affairs.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002wSKZ</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002wSKZ</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>build_card</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Returns a QBR storyboard for an account with milestones, scorecard versus plan, decisions needed and actions by function. The output is always renderable; always use show_command to display it.</description>
+                <invocationTarget>PPQbrBuilderAction</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+                <localDeveloperName>build_card</localDeveloperName>
+                <masterLabel>Build Card</masterLabel>
+                <progressIndicatorMessage>Building your QBR Storyboard...</progressIndicatorMessage>
+            </localActions>
+            <localDeveloperName>qbr_prep</localDeveloperName>
+            <masterLabel>Qbr Prep</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <masterLabel>PP QBR Agent</masterLabel>
+        <plannerType>Atlas__ConcurrentMultiAgentOrchestration</plannerType>
+    </planner>
+    <smallTalkEnabled>false</smallTalkEnabled>
+    <staticPromptsEnabled>false</staticPromptsEnabled>
+    <status>Inactive</status>
+    <stopRecPrompts>false</stopRecPrompts>
+    <surfacesEnabled>false</surfacesEnabled>
+    <toneType>Casual</toneType>
+    <version>1</version>
+    <welcomeMessage>Hi! I&apos;m your QBR prep partner. Ask me to prep a quarterly business review for one of your accounts.</welcomeMessage>
+</AiAgentDefinitionVersion>

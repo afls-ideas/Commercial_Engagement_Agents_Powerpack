@@ -42,6 +42,27 @@ See **[docs/LIGHTNING_TYPES.md](docs/LIGHTNING_TYPES.md)** for how CLTs are wire
 `@apexClassType` binding resolve, the runtime permission requirement, and the roadmap for
 tables, timelines, and charts.
 
+## Power Pack: Five Persona Agents
+
+Five scenario agents show how Agentforce augments pharma and medtech reps in specific business situations. Each is a thin agent over a shared layer; **the behaviour lives in prompt templates and scenario-fact records the customer can edit**, not in Apex.
+
+| Agent | Persona | Card (custom Lightning type) |
+|-------|---------|------------------------------|
+| `PP_Myeloma_Launch_Agent` | Oncology launch rep, relapsed/refractory multiple myeloma, REMS + certified-center referral | `ppLaunchFunnel` funnel stepper |
+| `PP_Cardio_Regional_Agent` | Cardiology rep in a high-prevalence, low-specialist region | `ppRegionalOpportunity` ranked opportunity list |
+| `PP_Health_System_Agent` | Rep managing a health system that follows a clinical protocol / committee process | `ppHealthSystemProtocol` stakeholder + protocol status |
+| `PP_Medtech_Cath_Agent` | Medtech cath-lab / structural heart rep | `ppCaseDay` case-day checklist + learning curve |
+| `PP_Rare_Disease_Agent` | Rare-disease rep finding undiagnosed patients | `ppDiagnosticJourney` journey stepper |
+
+**How it fits together**
+- Apex action (`PP*Action`) -> gathers account context (`PPContext`) + scenario facts -> runs the persona prompt template (`PP_*_Brief`) -> template returns JSON -> parsed to `PPCard` -> rendered by the persona LWC on the shared `ppCardView`, with one-tap buttons (create task, copy text, open record, escalate).
+- **Change personality / outcomes:** edit the prompt template in Setup (persona, priorities, compliance rules, output shape).
+- **Change facts:** edit `Power Pack Scenario Fact` custom metadata (product, label, REMS, protocol, centers, per-account status). All shipped facts are fictional demo data.
+- Every agent has a `compliance_check` topic backed by `PP_Compliance_Guardrails` (on-label / off-label / adverse event / diagnostic suggestion routing).
+- `tools/` holds the generators (`gen_template.py`, `gen_facts.py`, `gen_persona_ui.py`, `gen_agent.py`) and the source text/TSV/JSON for each persona; re-run them to regenerate metadata.
+
+**Setup:** assign the agent's `PP_*_Access` permission set plus `EinsteinGPTPromptTemplateUser` to the rep. Publish with `sf agent publish authoring-bundle --api-name <Agent>` then `sf agent activate`.
+
 ## Multi-Country Agents
 
 | Country | Agent | Language | Regulatory Framework | Territory Example |
@@ -148,3 +169,26 @@ The Account Brief rich card additionally requires the `FSRAccountBrief*` classes
 - Einstein Generative AI (for prompt template invocation via `ConnectApi.EinsteinLlm`)
 - Territory Management (for territory-aware account filtering and country resolution)
 - `TerritoryPreferenceReader` Apex class (deployed separately in the org)
+
+## Scenario walk-throughs
+
+Each walk-through has a script, the expected card in the Agentforce panel, and what to customize:
+
+- [Myeloma launch](docs/scenarios/myeloma-launch.md)
+- [Cardio regional opportunity](docs/scenarios/cardio-regional-opportunity.md)
+- [Health system committee buy-in (P&T map)](docs/scenarios/health-system-committee-buy-in.md)
+- [Medtech case-day readiness](docs/scenarios/medtech-case-day.md)
+- [Rare disease diagnostic journey](docs/scenarios/rare-disease-diagnostic-journey.md)
+
+Commercial account-planning agents (each with its own visualization):
+
+- [Account plan builder](docs/scenarios/account-plan-builder.md): goal tree, plan-health gauge, SWOT
+- [Formulary and pathway status](docs/scenarios/formulary-pathway-status.md): tier heatmap, decision timeline
+- [Whitespace and opportunity](docs/scenarios/whitespace-opportunity.md): bubble matrix with Grow / Defend / Develop / Maintain
+- [Stakeholder coverage](docs/scenarios/stakeholder-coverage.md): org-chart network with strength rings and gaps
+- [Cross-functional QBR huddle](docs/scenarios/qbr-account-huddle.md): timeline, scorecard vs plan, decisions, actions by function
+
+### Managed Events agents (read and write)
+- [Event Planner](docs/scenarios/event-planner.md): suggests an event, runs a compliance preflight, creates the Draft event after the rep confirms
+
+Screenshots show org and user details; review before publishing.

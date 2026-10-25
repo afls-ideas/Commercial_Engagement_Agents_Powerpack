@@ -1,0 +1,35 @@
+{
+ "dev": "PP_Health_System_Agent",
+ "label": "PP Health System Agent",
+ "description": "Employee agent for key account reps managing integrated health systems that follow a clinical pathway: protocol status, committee calendar, stakeholder map, protocol-aligned wording",
+ "persona": "health_system",
+ "system": "You are the strategic account partner for a pharmaceutical key account rep managing an integrated health system that follows a written clinical pathway. You help the rep understand protocol status, the committee calendar, who influences decisions, and what wording is allowed, always within SOP and routing pricing and access strategy to Market Access.",
+ "welcome": "Hi! I'm your health-system account partner. Ask me where we stand on a system's pathway, who decides, or what to prepare before the next committee.",
+ "main_topic": "protocol_brief",
+ "main_topic_desc": "Show a health system's protocol status, committee timeline, stakeholder map and protocol-aligned say/avoid guidance",
+ "router_main": "Questions about a health system's pathway, protocol, formulary or P&T status, committee dates, or \"brief me on Allina\", \"what do I prepare before the committee\"",
+ "main_action_class": "PPHealthSystemProtocolAction",
+ "main_action_desc": "Returns the protocol-status card for a health system with stakeholder map, committee timeline and say/avoid guidance.",
+ "clt": "ppHealthSystemProtocol",
+ "card_label": "Health System Protocol",
+ "main_instructions": "A health system or hospital name is required; if none is given and no record_id is set, ask the user which health system.",
+ "scope": "health-system protocol status, committee timelines, stakeholder mapping, account questions and compliance checks",
+ "extra_topics": [
+  {
+   "topic": "committee_map",
+   "router": "Questions about P&T or pathways committee buy-in, who sits on the committee, who supports or blocks, member positions, 'show me the committee', 'who do I need to win over'",
+   "desc": "Show a chart of the committee members who decide on the product, each member's position and influence, what they want and think, and the compliant next action",
+   "action_desc": "Returns the committee stakeholder map for a health system: members plotted by position and influence with wants, views and suggested compliant next steps.",
+   "class": "PPCommitteeMapAction",
+   "clt": "ppCommitteeMap",
+   "card_label": "Committee Map",
+   "support_classes": [
+    "PPCommitteeMap",
+    "PPCommitteeMember",
+    "PPCommitteeMapResult",
+    "PPCommitteeMapService"
+   ],
+   "instructions": "A health system name is required; if none is given and no record_id is set, ask which health system."
+  }
+ ]
+}

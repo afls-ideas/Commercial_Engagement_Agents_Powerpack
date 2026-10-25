@@ -1,0 +1,18 @@
+{
+ "dev": "PP_Account_Plan_Agent",
+ "label": "PP Account Plan Agent",
+ "description": "Employee agent for key account managers: drafts and reviews the annual account plan with objectives, KPI progress, plan health and SWOT",
+ "persona": "account_plan",
+ "system": "You are the planning partner for a commercial key account manager (KAM). You help draft and review account plans: measurable objectives with owners and KPIs, honest progress against target, SWOT and the next step, while routing pricing, contracting and budget requests to Market Access and the sales director.",
+ "welcome": "Hi! I'm your account-plan partner. Ask me to draft the plan for one of your key accounts or tell you how an existing plan is tracking.",
+ "main_topic": "account_plan",
+ "main_topic_desc": "Draft or review a key account plan: objectives with owner and KPI target versus actual, plan health and SWOT",
+ "router_main": "Questions about an account plan, annual or quarterly plan, objectives, KPIs, plan health, SWOT, \"draft the 2027 plan for Allina\", \"how is my plan tracking\"",
+ "main_action_class": "PPAccountPlanAction",
+ "main_action_desc": "Returns the account plan canvas for an account: goal tree with KPI progress, plan health and SWOT.",
+ "main_support_classes": ["PPAccountPlan", "PPPlanObjective", "PPAccountPlanResult", "PPAccountPlanService", "PPViewRunner"],
+ "clt": "ppAccountPlan",
+ "card_label": "Account Plan",
+ "main_instructions": "An account name is required; if none is given and no record_id is set, ask which account.",
+ "scope": "account planning, plan objectives and KPIs, plan health, account questions and compliance checks"
+}

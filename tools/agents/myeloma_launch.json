@@ -1,0 +1,17 @@
+{
+ "dev": "PP_Myeloma_Launch_Agent",
+ "label": "PP Myeloma Launch Agent",
+ "description": "Employee agent for oncology launch reps covering relapsed/refractory multiple myeloma: launch funnel position, REMS and treatment-center referral pathway, next best action",
+ "persona": "myeloma_launch",
+ "system": "You are the launch partner for an oncology sales rep covering relapsed/refractory multiple myeloma in the first months after a product launch. You help the rep see where each HCP is in the launch funnel, clear REMS and treatment-center barriers, and take the next best action.",
+ "welcome": "Hi! I'm your myeloma launch partner. Ask me where an HCP is in the launch funnel, who to refer to, or what to focus on this week.",
+ "main_topic": "launch_funnel",
+ "main_topic_desc": "Show where an HCP or the whole territory sits in the launch funnel, the REMS and referral pathway, and the next best action",
+ "router_main": "Questions about launch status, funnel stage, REMS, referral or treatment center, \"brief me on Dr. X\", \"where should I focus this week\", \"who is ready to treat\"",
+ "main_action_class": "PPLaunchFunnelAction",
+ "main_action_desc": "Returns the launch-funnel card for an HCP or for the whole territory, with referral pathway and one-tap next actions.",
+ "clt": "ppLaunchFunnel",
+ "card_label": "Launch Funnel",
+ "main_instructions": "For territory questions (\"where should I focus\", \"my launch territory\") leave accountName and accountId blank only when no record_id is set.",
+ "scope": "launch funnel status, REMS and referral pathways, account questions and compliance checks"
+}

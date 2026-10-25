@@ -1,0 +1,5 @@
+{
+  "title": "PP Committee Map",
+  "description": "Committee stakeholder map (position vs influence) rendered in a Power Pack Agentforce agent.",
+  "lightning:type": "@apexClassType/c__PPCommitteeMap"
+}

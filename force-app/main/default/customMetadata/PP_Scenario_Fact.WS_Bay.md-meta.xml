@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>WS Bay</label>
+    <protected>false</protected>
+    <values>
+        <field>Account_Name__c</field>
+        <value xsi:type="xsd:string">Bay Area Specialty Pharmacy</value>
+    </values>
+    <values>
+        <field>Category__c</field>
+        <value xsi:type="xsd:string">Account potential</value>
+    </values>
+    <values>
+        <field>Fact__c</field>
+        <value xsi:type="xsd:string">ACCOUNT: Bay Area Specialty Pharmacy | SEGMENT: Specialty pharmacy | POTENTIAL: 40 | SHARE: 65 | REVENUE: 520 | WHITESPACE: Mature channel; incremental growth limited. | BARRIER: Few untapped patients; margin pressure.</value>
+    </values>
+    <values>
+        <field>Persona__c</field>
+        <value xsi:type="xsd:string">whitespace</value>
+    </values>
+</CustomMetadata>

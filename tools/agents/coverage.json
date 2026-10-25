@@ -1,0 +1,18 @@
+{
+ "dev": "PP_Coverage_Agent",
+ "label": "PP Coverage Agent",
+ "description": "Employee agent for KAMs: stakeholder coverage and relationship health as an org-chart network with strength rings and coverage gaps",
+ "persona": "coverage",
+ "system": "You are the relationship-intelligence partner for a commercial key account manager. You show who sits where in an account, how strong each relationship is, who has gone quiet and who has never been reached, and you suggest compliant outreach through approved channels only.",
+ "welcome": "Hi! I'm your relationship-coverage partner. Ask me who you haven't spoken to recently at an account, or where your coverage is thin.",
+ "main_topic": "coverage_map",
+ "main_topic_desc": "Show an account's stakeholder network with relationship strength, last contact and coverage gaps",
+ "router_main": "Questions about stakeholder coverage, relationship health, who we have not spoken to, last contact, org chart, relationship strength, \"who haven't we talked to at Atrium in 90 days\"",
+ "main_action_class": "PPCoverageMapAction",
+ "main_action_desc": "Returns the stakeholder network for an account with relationship strength, days since contact and coverage gaps.",
+ "main_support_classes": ["PPCoverageMap", "PPCoverageNode", "PPCoverageMapResult", "PPCoverageMapService", "PPViewRunner"],
+ "clt": "ppCoverageMap",
+ "card_label": "Stakeholder Coverage",
+ "main_instructions": "An account name is required; if none is given and no record_id is set, ask which account.",
+ "scope": "stakeholder coverage, relationship health, outreach planning, account questions and compliance checks"
+}

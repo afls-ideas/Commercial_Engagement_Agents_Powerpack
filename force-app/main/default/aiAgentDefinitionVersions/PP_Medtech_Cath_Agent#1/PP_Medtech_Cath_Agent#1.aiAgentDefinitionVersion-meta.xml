@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AiAgentDefinitionVersion xmlns="http://soap.sforce.com/2006/04/metadata">
+    <articleAnswersGPTEnabled>false</articleAnswersGPTEnabled>
+    <billingMode>ActionBased</billingMode>
+    <citationsEnabled>false</citationsEnabled>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The agent instructions</description>
+        <developerName>AgentScriptInternal_agent_instructions</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Agent Instructions</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The next topic to be visited</description>
+        <developerName>AgentScriptInternal_next_topic</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Next Topic</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The record ID from the current page context</description>
+        <developerName>record_id</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Record Id</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <copilotPrimaryLanguage>en_US</copilotPrimaryLanguage>
+    <genAiPlannerName>PP_Medtech_Cath_Agent_v1</genAiPlannerName>
+    <isScriptCompatibleAgent>true</isScriptCompatibleAgent>
+    <knowledgeActionEnabled>false</knowledgeActionEnabled>
+    <knowledgeFallbackEnabled>false</knowledgeFallbackEnabled>
+    <planner>
+        <fullName>PP_Medtech_Cath_Agent_v1</fullName>
+        <agentGraphRef>20ZgL00000BAAe5</agentGraphRef>
+        <description>Employee agent for medtech reps supporting cardiac procedures (TAVR/ablation) in the cath lab: case-day readiness checklist, physician learning curve and proctoring, and VAC evidence pack. Intended for the LS MT Field Sales Representative profile.</description>
+        <localTopicLinks>
+            <genAiPluginName>account_qa</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>agent_router</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>ambiguous_question</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>case_day</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>compliance_check</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>off_topic</genAiPluginName>
+        </localTopicLinks>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Answer general questions about an account or HCP using visit history, messages and insights</description>
+            <genAiPluginInstructions>
+                <description>You are the case-day partner for a medical device rep supporting structural heart and ablation procedures. You help the rep confirm case readiness, see where each physician is in their learning curve, and prepare evidence for the hospital Value Analysis Committee. You never give medical advice or direct clinical decisions.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002w4zm</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002w4zm</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>ask_about_account</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Ask any question about an account or HCP. Gathers sales context and returns an AI-generated summary.</description>
+                <invocationTarget>FSRAskAboutAccountAction</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>ask_about_account</localDeveloperName>
+                <masterLabel>Ask About Account</masterLabel>
+            </localActions>
+            <localDeveloperName>account_qa</localDeveloperName>
+            <masterLabel>Account Qa</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Route the user to the appropriate topic</description>
+            <genAiPluginInstructions>
+                <description>You are the case-day partner for a medical device rep supporting structural heart and ablation procedures. You help the rep confirm case readiness, see where each physician is in their learning curve, and prepare evidence for the hospital Value Analysis Committee. You never give medical advice or direct clinical decisions.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002w4zl</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002w4zl</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>agent_router</localDeveloperName>
+            <masterLabel>Agent Router</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Ask for clarification when the request is unclear</description>
+            <genAiPluginInstructions>
+                <description>You are the case-day partner for a medical device rep supporting structural heart and ablation procedures. You help the rep confirm case readiness, see where each physician is in their learning curve, and prepare evidence for the hospital Value Analysis Committee. You never give medical advice or direct clinical decisions.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002w4zo</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002w4zo</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>ambiguous_question</localDeveloperName>
+            <masterLabel>Ambiguous Question</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Build the case-day readiness checklist, physician learning-curve and proctoring status, and VAC evidence pack for a physician or hospital</description>
+            <genAiPluginInstructions>
+                <description>You are the case-day partner for a medical device rep supporting structural heart and ablation procedures. You help the rep confirm case readiness, see where each physician is in their learning curve, and prepare evidence for the hospital Value Analysis Committee. You never give medical advice or direct clinical decisions.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002w4zq</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002w4zq</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>build_card</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Returns the case-day checklist card for a physician or hospital, with learning-curve status, VAC evidence and one-tap next actions. The output is always renderable; always use show_command to display it.</description>
+                <invocationTarget>PPCaseDayBriefAction</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+                <localDeveloperName>build_card</localDeveloperName>
+                <masterLabel>Build Card</masterLabel>
+                <progressIndicatorMessage>Building your Case Day...</progressIndicatorMessage>
+            </localActions>
+            <localDeveloperName>case_day</localDeveloperName>
+            <masterLabel>Case Day</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Classify a question as on-label, off-label, adverse event or promotional claim and give the compliant way to respond</description>
+            <genAiPluginInstructions>
+                <description>You are the case-day partner for a medical device rep supporting structural heart and ablation procedures. You help the rep confirm case readiness, see where each physician is in their learning curve, and prepare evidence for the hospital Value Analysis Committee. You never give medical advice or direct clinical decisions.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002w4zn</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002w4zn</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>check</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Classifies the question and returns the compliant response and escalation steps.</description>
+                <invocationTarget>PPComplianceAction</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>check</localDeveloperName>
+                <masterLabel>Check</masterLabel>
+            </localActions>
+            <localDeveloperName>compliance_check</localDeveloperName>
+            <masterLabel>Compliance Check</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Redirect off-topic requests</description>
+            <genAiPluginInstructions>
+                <description>You are the case-day partner for a medical device rep supporting structural heart and ablation procedures. You help the rep confirm case readiness, see where each physician is in their learning curve, and prepare evidence for the hospital Value Analysis Committee. You never give medical advice or direct clinical decisions.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002w4zp</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002w4zp</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>off_topic</localDeveloperName>
+            <masterLabel>Off Topic</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <masterLabel>PP Medtech Cath Lab Agent</masterLabel>
+        <plannerType>Atlas__ConcurrentMultiAgentOrchestration</plannerType>
+    </planner>
+    <smallTalkEnabled>false</smallTalkEnabled>
+    <staticPromptsEnabled>false</staticPromptsEnabled>
+    <status>Inactive</status>
+    <stopRecPrompts>false</stopRecPrompts>
+    <surfacesEnabled>false</surfacesEnabled>
+    <toneType>Casual</toneType>
+    <version>1</version>
+    <welcomeMessage>Hi! I&apos;m your case-day partner. Ask me to get you ready for a case with a physician, check a hospital&apos;s VAC status, or review a physician&apos;s proctoring progress.</welcomeMessage>
+</AiAgentDefinitionVersion>

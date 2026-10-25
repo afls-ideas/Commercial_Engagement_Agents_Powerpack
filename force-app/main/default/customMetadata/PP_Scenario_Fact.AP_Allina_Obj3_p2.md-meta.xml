@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>AP Allina Obj3 p2</label>
+    <protected>false</protected>
+    <values>
+        <field>Account_Name__c</field>
+        <value xsi:type="xsd:string">Allina Health</value>
+    </values>
+    <values>
+        <field>Category__c</field>
+        <value xsi:type="xsd:string">Plan objective</value>
+    </values>
+    <values>
+        <field>Fact__c</field>
+        <value xsi:type="xsd:string">(continued) TARGET: 55 per quarter by Q4 2027 | ACTUAL: 44 in Q3 2026 | DUE: 2027-12-31 | INITIATIVES: Complete value-analysis packet for the new valve size; schedule case support in two cath labs; agree evidence review with the VAC</value>
+    </values>
+    <values>
+        <field>Persona__c</field>
+        <value xsi:type="xsd:string">account_plan</value>
+    </values>
+</CustomMetadata>

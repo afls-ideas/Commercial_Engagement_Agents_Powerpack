@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>HS Wording p2</label>
+    <protected>false</protected>
+    <values>
+        <field>Category__c</field>
+        <value xsi:type="xsd:string">Approved wording</value>
+    </values>
+    <values>
+        <field>Fact__c</field>
+        <value xsi:type="xsd:string">'Immunonco is indicated for adults with relapsed or refractory multiple myeloma after at least four prior lines of therapy including a proteasome inhibitor, an immunomodulatory agent and an anti-CD38 antibody.' Rep may offer the approved dossier and</value>
+    </values>
+    <values>
+        <field>Persona__c</field>
+        <value xsi:type="xsd:string">health_system</value>
+    </values>
+</CustomMetadata>

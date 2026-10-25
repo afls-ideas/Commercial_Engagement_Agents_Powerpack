@@ -1,0 +1,97 @@
+<template>
+    <template lwc:if={hasCard}>
+        <article class="pp-card">
+            <header class="pp-header">
+                <div class="pp-avatar"><lightning-icon icon-name="standard:product_item" size="small" variant="inverse"></lightning-icon></div>
+                <div class="pp-heading">
+                    <h2 class="pp-title">{card.title}</h2>
+                    <template lwc:if={card.subtitle}><p class="pp-sub">{card.subtitle}</p></template>
+                </div>
+                <template lwc:if={card.badge}><span class={badgeClass}>{card.badge}</span></template>
+            </header>
+            <template lwc:if={card.headline}><p class="pp-headline">{card.headline}</p></template>
+            <div class="pp-metrics">
+                <template for:each={metrics} for:item="m">
+                    <div key={m.key} class={m.cls}><span class="pp-metric-label">{m.label}</span><span class="pp-metric-value">{m.value}</span></div>
+                </template>
+            </div>
+
+            <template lwc:if={hasRows}>
+                <section class="pp-block">
+                    <h3 class="pp-block-heading">Status by account (soonest decision first)</h3>
+                    <div class="fm-grid fm-head" style={gridStyle}>
+                        <span class="fm-h">Account</span>
+                        <template for:each={products} for:item="p"><span key={p} class="fm-h fm-h-c">{p}</span></template>
+                    </div>
+                    <template for:each={rows} for:item="r">
+                        <div key={r.key} class={r.rowCls}>
+                            <div class="fm-grid" style={gridStyle} data-idx={r.idx} tabindex="0" role="button" aria-label={r.account} onclick={handleSelect} onkeydown={handleKey}>
+                                <span class="fm-acct">{r.account}<span class="fm-type"> {r.accountType}</span><span class={r.whenCls}> &middot; decision {r.when}</span></span>
+                                <template for:each={r.cells} for:item="c"><span key={c.key} class={c.cls}>{c.tier}</span></template>
+                            </div>
+                        </div>
+                    </template>
+                    <div class="fm-legend">
+                        <span class="fm-key fm-preferred">Preferred</span><span class="fm-key fm-alternate">Alternate</span>
+                        <span class="fm-key fm-restricted">Restricted</span><span class="fm-key fm-none">Not reviewed</span>
+                    </div>
+                </section>
+
+                <template lwc:if={selected}>
+                    <section class="cm-detail" aria-live="polite">
+                        <div class="cm-detail-name">
+                            <template lwc:if={selected.recordId}><a href="#" class="cm-link" onclick={handleOpen}>{selected.account}</a></template>
+                            <template lwc:else>{selected.account}</template>
+                            <span class="fm-type"> {selected.accountType}</span>
+                        </div>
+                        <template lwc:if={selected.hasTimeline}>
+                            <svg class="fm-tl" viewBox="0 0 320 54" role="img" aria-label="Submission to decision timeline">
+                                <line class="fm-tl-base" x1="12" y1="26" x2="308" y2="26"></line>
+                                <rect class="fm-tl-bar" x={selected.subX} y="22" width={selected.barW} height="8" rx="4"></rect>
+                                <template lwc:if={selected.hasSub}>
+                                    <circle class="fm-tl-dot" cx={selected.subX} cy="26" r="5"></circle>
+                                    <text class="fm-tl-txt" x={selected.subX} y="46">Submitted {selected.subLabel}</text>
+                                </template>
+                                <line class="fm-tl-now" x1={selected.nowX} y1="10" x2={selected.nowX} y2="42"></line>
+                                <text class="fm-tl-now-txt" x={selected.nowX} y="8" text-anchor="middle">Today</text>
+                                <circle class="fm-tl-due" cx={selected.dueX} cy="26" r="6"></circle>
+                                <text class="fm-tl-txt" x={selected.dueX} y="46" text-anchor="end">Decision {selected.dueLabel}</text>
+                            </svg>
+                        </template>
+                        <ul class="fm-notes">
+                            <template for:each={selected.notes} for:item="n">
+                                <li key={n.key}><span class={n.cls}>{n.product}: {n.tier}</span> {n.note}</li>
+                            </template>
+                        </ul>
+                        <p class={selected.riskCls}><b>Risk:</b> {selected.risk}</p>
+                        <template lwc:if={selected.action}>
+                            <button class={selActionCls} disabled={selActionDisabled} onclick={handleRowAction}>{selActionLabel}</button>
+                        </template>
+                    </section>
+                </template>
+            </template>
+
+            <template for:each={sections} for:item="s">
+                <section key={s.key} class="pp-block">
+                    <h3 class="pp-block-heading">{s.heading}</h3>
+                    <ul class="pp-bullets"><template for:each={s.bullets} for:item="b"><li key={b.key}>{b.text}</li></template></ul>
+                </section>
+            </template>
+            <template lwc:if={card.nextStep}>
+                <div class="pp-next">
+                    <lightning-icon icon-name="utility:target" size="xx-small"></lightning-icon>
+                    <div><span class="pp-next-label">Next step</span><span class="pp-next-value">{card.nextStep}</span></div>
+                </div>
+            </template>
+            <template lwc:if={hasActions}>
+                <div class="pp-actions">
+                    <template for:each={actions} for:item="a">
+                        <button key={a.key} class={a.cls} data-key={a.key} disabled={a.disabled} onclick={handleAction}>{a.label}</button>
+                    </template>
+                </div>
+            </template>
+            <template lwc:if={message}><p class="pp-message">{message}</p></template>
+        </article>
+    </template>
+    <template lwc:else><div class="pp-empty">Nothing to show yet.</div></template>
+</template>

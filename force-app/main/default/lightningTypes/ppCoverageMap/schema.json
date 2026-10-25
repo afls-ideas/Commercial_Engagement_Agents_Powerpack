@@ -1,0 +1,5 @@
+{
+  "title": "PP Coverage Map",
+  "description": "Stakeholder coverage network rendered in a Power Pack Agentforce agent.",
+  "lightning:type": "@apexClassType/c__PPCoverageMap"
+}

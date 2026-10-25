@@ -1,0 +1,5 @@
+{
+  "title": "PP Account Plan",
+  "description": "Account plan canvas (goal tree, plan health, SWOT) rendered in a Power Pack Agentforce agent.",
+  "lightning:type": "@apexClassType/c__PPAccountPlan"
+}

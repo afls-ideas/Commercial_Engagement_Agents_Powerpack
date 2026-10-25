@@ -1,0 +1,5 @@
+{
+  "title": "PP Diagnostic Journey",
+  "description": "PP Diagnostic Journey card rendered in a Power Pack Agentforce agent.",
+  "lightning:type": "@apexClassType/c__PPCard"
+}

@@ -1,0 +1,5 @@
+{
+  "title": "PP Regional Opportunity",
+  "description": "PP Regional Opportunity card rendered in a Power Pack Agentforce agent.",
+  "lightning:type": "@apexClassType/c__PPCard"
+}

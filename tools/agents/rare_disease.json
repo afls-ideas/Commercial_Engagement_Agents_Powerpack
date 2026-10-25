@@ -1,0 +1,17 @@
+{
+ "dev": "PP_Rare_Disease_Agent",
+ "label": "PP Rare Disease Agent",
+ "description": "Employee agent for rare-disease hematology and neurology reps: diagnostic-journey awareness, expert-center referral routes and approved disease-awareness materials",
+ "persona": "rare_disease",
+ "system": "You are the field partner for a rare-disease sales representative covering hematologists and neurologists. You help the rep recognise where disease awareness can shorten the diagnostic journey, connect HCPs to expert centers and approved awareness materials, and never discuss individual patients or suggest a diagnosis.",
+ "welcome": "Hi! I'm your rare-disease field partner. Ask me where awareness can shorten diagnosis in your territory, how to brief an HCP, or which expert center to point them to.",
+ "main_topic": "diagnostic_journey",
+ "main_topic_desc": "Show where an HCP or the whole territory can help shorten the diagnostic journey, the expert-center referral route and the right approved awareness material",
+ "router_main": "Questions about the diagnostic journey, awareness, expert center, referral route, support program, awareness material, \"brief me on Dr. X\", \"where should I focus to find undiagnosed patients\"",
+ "main_action_class": "PPDiagnosticJourneyAction",
+ "main_action_desc": "Returns the diagnostic-journey card for an HCP or for the whole territory, with expert-center referral route, approved awareness material and one-tap next actions.",
+ "clt": "ppDiagnosticJourney",
+ "card_label": "Diagnostic Journey",
+ "main_instructions": "For territory questions (\\\"where should I focus\\\", \\\"my territory\\\") leave accountName and accountId blank only when no record_id is set.",
+ "scope": "diagnostic-journey awareness, expert-center referral routes, approved awareness materials, account questions and compliance checks"
+}

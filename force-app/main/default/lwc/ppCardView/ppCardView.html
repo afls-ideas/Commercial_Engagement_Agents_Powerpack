@@ -1,0 +1,83 @@
+<template>
+    <template lwc:if={hasCard}>
+        <article class="pp-card">
+            <header class="pp-header">
+                <div class="pp-avatar"><lightning-icon icon-name={iconName} size="small" variant="inverse"></lightning-icon></div>
+                <div class="pp-heading">
+                    <h2 class="pp-title">{card.title}</h2>
+                    <template lwc:if={card.subtitle}><p class="pp-sub">{card.subtitle}</p></template>
+                </div>
+                <template lwc:if={card.badge}><span class={badgeClass}>{card.badge}</span></template>
+            </header>
+
+            <template lwc:if={card.headline}><p class="pp-headline">{card.headline}</p></template>
+
+            <template lwc:if={hasMetrics}>
+                <div class="pp-metrics">
+                    <template for:each={metrics} for:item="m">
+                        <div key={m.key} class={m.cls}>
+                            <span class="pp-metric-label">{m.label}</span>
+                            <span class="pp-metric-value">{m.value}</span>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <template lwc:if={hasRows}>
+                <section class="pp-block">
+                    <template lwc:if={card.rowsHeading}><h3 class="pp-block-heading">{card.rowsHeading}</h3></template>
+                    <ol class={rowsClass}>
+                        <template for:each={rows} for:item="r">
+                            <li key={r.key} class={r.cls}>
+                                <span class="pp-dot"></span>
+                                <div class="pp-row-body">
+                                    <div class="pp-row-top">
+                                        <span class="pp-row-label">{r.label}</span>
+                                        <template lwc:if={r.status}><span class={r.chipCls}>{r.status}</span></template>
+                                    </div>
+                                    <template lwc:if={r.hasScore}>
+                                        <div class="pp-bar"><div class="pp-bar-fill" style={r.barStyle}></div></div>
+                                    </template>
+                                    <template lwc:if={r.detail}><p class="pp-row-detail">{r.detail}</p></template>
+                                    <template lwc:if={r.action}>
+                                        <button class="pp-btn pp-btn-small" data-key={r.key} onclick={handleRowAction}>{r.actionLabel}</button>
+                                    </template>
+                                </div>
+                            </li>
+                        </template>
+                    </ol>
+                </section>
+            </template>
+
+            <template for:each={sections} for:item="s">
+                <section key={s.key} class="pp-block">
+                    <h3 class="pp-block-heading">{s.heading}</h3>
+                    <ul class="pp-bullets">
+                        <template for:each={s.bullets} for:item="b"><li key={b.key}>{b.text}</li></template>
+                    </ul>
+                </section>
+            </template>
+
+            <template lwc:if={card.nextStep}>
+                <div class="pp-next">
+                    <lightning-icon icon-name="utility:target" size="xx-small"></lightning-icon>
+                    <div><span class="pp-next-label">Next step</span><span class="pp-next-value">{card.nextStep}</span></div>
+                </div>
+            </template>
+
+            <template lwc:if={hasActions}>
+                <div class="pp-actions">
+                    <template for:each={actions} for:item="a">
+                        <button key={a.key} class={a.cls} data-key={a.key} disabled={a.disabled} onclick={handleAction}>
+                            {a.label}
+                        </button>
+                    </template>
+                </div>
+                <template lwc:if={message}><p class="pp-message">{message}</p></template>
+            </template>
+        </article>
+    </template>
+    <template lwc:else>
+        <div class="pp-empty">Nothing to show yet.</div>
+    </template>
+</template>

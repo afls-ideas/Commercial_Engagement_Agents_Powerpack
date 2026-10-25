@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>FM Partners Immunexis</label>
+    <protected>false</protected>
+    <values>
+        <field>Account_Name__c</field>
+        <value xsi:type="xsd:string">Partners HealthCare</value>
+    </values>
+    <values>
+        <field>Category__c</field>
+        <value xsi:type="xsd:string">Formulary status</value>
+    </values>
+    <values>
+        <field>Fact__c</field>
+        <value xsi:type="xsd:string">ACCOUNT: Partners HealthCare | TYPE: IDN | PRODUCT: Immunexis | TIER: Preferred | SUBMITTED: 2025-07-28 | DECISION DUE: 2025-10-30 | NOTE: Preferred; prior authorisation staff education under way. | RISK: Prior-authorisation friction at clinic level.</value>
+    </values>
+    <values>
+        <field>Persona__c</field>
+        <value xsi:type="xsd:string">formulary</value>
+    </values>
+</CustomMetadata>

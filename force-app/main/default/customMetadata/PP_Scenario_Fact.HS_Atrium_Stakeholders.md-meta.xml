@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>HS Atrium Stakeholders</label>
+    <protected>false</protected>
+    <values>
+        <field>Account_Name__c</field>
+        <value xsi:type="xsd:string">Atrium Health</value>
+    </values>
+    <values>
+        <field>Category__c</field>
+        <value xsi:type="xsd:string">Stakeholders</value>
+    </values>
+    <values>
+        <field>Fact__c</field>
+        <value xsi:type="xsd:string">Demo stakeholders: Dr. Omar Haddad, Hematology Pathway Council chair - NEUTRAL, evidence-focused, last contact 2026-06-11; Lena Ortiz PharmD, system oncology pharmacy director - NEUTRAL, cares about REMS operations and inpatient capacity; Dr.</value>
+    </values>
+    <values>
+        <field>Persona__c</field>
+        <value xsi:type="xsd:string">health_system</value>
+    </values>
+</CustomMetadata>

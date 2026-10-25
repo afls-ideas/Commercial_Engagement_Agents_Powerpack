@@ -1,0 +1,14 @@
+{
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "card" : {
+      "title" : "Case Day",
+      "description" : "The structured Case Day. The output is always renderable; always use show_command to display it to the user.",
+      "lightning:type" : "c__ppCaseDay",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : true,
+      "copilotAction:isUsedByPlanner" : true
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

@@ -1,0 +1,100 @@
+<template>
+    <template lwc:if={hasCard}>
+        <article class="pp-card">
+            <header class="pp-header">
+                <div class="pp-avatar"><lightning-icon icon-name="standard:opportunity" size="small" variant="inverse"></lightning-icon></div>
+                <div class="pp-heading">
+                    <h2 class="pp-title">{card.title}</h2>
+                    <template lwc:if={card.subtitle}><p class="pp-sub">{card.subtitle}</p></template>
+                </div>
+            </header>
+            <template lwc:if={card.headline}><p class="pp-headline">{card.headline}</p></template>
+            <div class="pp-metrics">
+                <template for:each={metrics} for:item="m">
+                    <div key={m.key} class={m.cls}><span class="pp-metric-label">{m.label}</span><span class="pp-metric-value">{m.value}</span></div>
+                </template>
+            </div>
+
+            <template lwc:if={hasAccounts}>
+                <section class="pp-block">
+                    <h3 class="pp-block-heading">Potential vs current share (bubble size = revenue)</h3>
+                    <svg class="cm-chart" viewBox={viewBox} role="group" aria-label="Accounts by potential and share">
+                        <rect class="ws-q ws-q-grow" x={plotLeft} y={plotTop} width={halfW} height={halfH}></rect>
+                        <rect class="ws-q ws-q-defend" x={midX} y={plotTop} width={halfW} height={halfH}></rect>
+                        <rect class="ws-q ws-q-develop" x={plotLeft} y={midY} width={halfW} height={halfH}></rect>
+                        <rect class="ws-q ws-q-maintain" x={midX} y={midY} width={halfW} height={halfH}></rect>
+                        <line class="cm-axis" x1={plotLeft} y1={plotBottom} x2={plotRight} y2={plotBottom}></line>
+                        <line class="cm-axis" x1={plotLeft} y1={plotTop} x2={plotLeft} y2={plotBottom}></line>
+                        <text class="ws-quad" x={plotLeft} y="24" dx="4">GROW</text>
+                        <text class="ws-quad" x={plotRight} y="24" dx="-4" text-anchor="end">DEFEND</text>
+                        <text class="ws-quad" x={plotLeft} y={plotBottom} dx="4" dy="-5">DEVELOP</text>
+                        <text class="ws-quad" x={plotRight} y={plotBottom} dx="-4" dy="-5" text-anchor="end">MAINTAIN</text>
+                        <text class="cm-label" x={midX} y={labelBottomY} text-anchor="middle">Current share of potential &rarr;</text>
+                        <text class="cm-label" x="9" y={axisYLabelY} text-anchor="middle" transform={axisYLabelTransform}>Potential &rarr;</text>
+                        <template for:each={accounts} for:item="a">
+                            <g key={a.key} class={a.gCls} transform={a.transform} data-idx={a.idx} tabindex="0" role="button" aria-label={a.aria}
+                               onclick={handleSelect} onkeydown={handleKey}>
+                                <circle class="ws-dot" r={a.r}></circle>
+                                <text class="cm-initials" text-anchor="middle" dy="3.5">{a.initials}</text>
+                            </g>
+                        </template>
+                    </svg>
+                </section>
+
+                <template lwc:if={selected}>
+                    <section class="cm-detail" aria-live="polite">
+                        <div class="cm-detail-top">
+                            <div>
+                                <div class="cm-detail-name">
+                                    <template lwc:if={selected.recordId}><a href="#" class="cm-link" onclick={handleOpen}>{selected.account}</a></template>
+                                    <template lwc:else>{selected.account}</template>
+                                </div>
+                                <div class="cm-detail-role">{selected.segment} &middot; {selected.revLabel} revenue</div>
+                            </div>
+                            <span class={selected.chipCls}>{selected.quadrant}</span>
+                        </div>
+                        <p class="cm-meta">Potential {selected.potential} &middot; Share {selected.share} &middot; Gap {selected.gap} points</p>
+                        <dl class="cm-notes">
+                            <dt>Whitespace</dt><dd>{selected.whitespace}</dd>
+                            <dt>Barrier</dt><dd>{selected.barrier}</dd>
+                        </dl>
+                        <template lwc:if={selected.action}>
+                            <button class={selected.actionCls} disabled={selected.actionDisabled} onclick={handleSelAction}>{selected.actionLabel}</button>
+                        </template>
+                    </section>
+                </template>
+
+                <ul class="cm-list">
+                    <template for:each={accounts} for:item="a">
+                        <li key={a.key} class={a.rowCls} data-idx={a.idx} tabindex="0" role="button" onclick={handleSelect} onkeydown={handleKey}>
+                            <span class="cm-row-name">{a.account}<span class="cm-row-role"> gap {a.gap}</span></span>
+                            <span class={a.chipCls}>{a.quadrant}</span>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+
+            <template for:each={sections} for:item="s">
+                <section key={s.key} class="pp-block">
+                    <h3 class="pp-block-heading">{s.heading}</h3>
+                    <ul class="pp-bullets"><template for:each={s.bullets} for:item="b"><li key={b.key}>{b.text}</li></template></ul>
+                </section>
+            </template>
+            <template lwc:if={card.nextStep}>
+                <div class="pp-next">
+                    <lightning-icon icon-name="utility:target" size="xx-small"></lightning-icon>
+                    <div><span class="pp-next-label">Next step</span><span class="pp-next-value">{card.nextStep}</span></div>
+                </div>
+            </template>
+            <template lwc:if={hasActions}>
+                <div class="pp-actions">
+                    <template for:each={actions} for:item="a">
+                        <button key={a.key} class={a.cls} data-key={a.key} disabled={a.disabled} onclick={handleAction}>{a.label}</button>
+                    </template>
+                </div>
+            </template>
+            <template lwc:if={message}><p class="pp-message">{message}</p></template>
+        </article>
+    </template>
+    <template lwc:else><div class="pp-empty">Nothing to show yet.</div></template>
+</template>

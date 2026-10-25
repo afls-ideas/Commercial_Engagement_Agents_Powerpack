@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>FM Allina Immunonco</label>
+    <protected>false</protected>
+    <values>
+        <field>Account_Name__c</field>
+        <value xsi:type="xsd:string">Allina Health</value>
+    </values>
+    <values>
+        <field>Category__c</field>
+        <value xsi:type="xsd:string">Formulary status</value>
+    </values>
+    <values>
+        <field>Fact__c</field>
+        <value xsi:type="xsd:string">ACCOUNT: Allina Health | TYPE: IDN | PRODUCT: Immunonco | TIER: Not reviewed | SUBMITTED: 2026-08-14 | DECISION DUE: 2026-11-18 | NOTE: Dossier requested by the oncology pathways committee; two voting members sceptical.</value>
+    </values>
+    <values>
+        <field>Persona__c</field>
+        <value xsi:type="xsd:string">formulary</value>
+    </values>
+</CustomMetadata>

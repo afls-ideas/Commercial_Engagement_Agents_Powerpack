@@ -1,0 +1,5 @@
+{
+  "title": "PP Event Planner",
+  "description": "Proposed commercial event with cost breakdown, budget fit and compliance preflight, with a create-draft button.",
+  "lightning:type": "@apexClassType/c__PPEventProposal"
+}

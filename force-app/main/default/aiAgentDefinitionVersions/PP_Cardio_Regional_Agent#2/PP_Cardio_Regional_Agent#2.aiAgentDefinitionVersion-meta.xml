@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AiAgentDefinitionVersion xmlns="http://soap.sforce.com/2006/04/metadata">
+    <articleAnswersGPTEnabled>false</articleAnswersGPTEnabled>
+    <billingMode>ActionBased</billingMode>
+    <citationsEnabled>false</citationsEnabled>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The agent instructions</description>
+        <developerName>AgentScriptInternal_agent_instructions</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Agent Instructions</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The next topic to be visited</description>
+        <developerName>AgentScriptInternal_next_topic</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Next Topic</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The record ID from the current page context</description>
+        <developerName>record_id</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Record Id</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <copilotPrimaryLanguage>en_US</copilotPrimaryLanguage>
+    <genAiPlannerName>PP_Cardio_Regional_Agent_v2</genAiPlannerName>
+    <isScriptCompatibleAgent>true</isScriptCompatibleAgent>
+    <knowledgeActionEnabled>false</knowledgeActionEnabled>
+    <knowledgeFallbackEnabled>false</knowledgeFallbackEnabled>
+    <planner>
+        <fullName>PP_Cardio_Regional_Agent_v2</fullName>
+        <agentGraphRef>20ZgL00000BACpZ</agentGraphRef>
+        <description>Employee agent for cardiology reps in high-prevalence regions: opportunity matrix by GDMT gap, talk tracks by HCP type, access resources and route planning</description>
+        <localTopicLinks>
+            <genAiPluginName>account_qa</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>agent_router</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>ambiguous_question</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>compliance_check</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>off_topic</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>regional_opportunity</genAiPluginName>
+        </localTopicLinks>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Answer general questions about an account or HCP using visit history, messages and insights</description>
+            <genAiPluginInstructions>
+                <description>You are the field partner for a cardiology sales rep whose territory has very high heart failure, hypertension and ASCVD prevalence, few cardiologists and long rural drive times. You help the rep see where the GDMT gap is largest, choose the right message for each HCP type, find access resources, and plan an efficient route.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002w5Sq</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002w5Sq</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>ask_about_account</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Ask any question about an account or HCP. Gathers sales context and returns an AI-generated summary.</description>
+                <invocationTarget>FSRAskAboutAccountAction</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>ask_about_account</localDeveloperName>
+                <masterLabel>Ask About Account</masterLabel>
+            </localActions>
+            <localDeveloperName>account_qa</localDeveloperName>
+            <masterLabel>Account Qa</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Route the user to the appropriate topic</description>
+            <genAiPluginInstructions>
+                <description>You are the field partner for a cardiology sales rep whose territory has very high heart failure, hypertension and ASCVD prevalence, few cardiologists and long rural drive times. You help the rep see where the GDMT gap is largest, choose the right message for each HCP type, find access resources, and plan an efficient route.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002w5Sp</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002w5Sp</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>agent_router</localDeveloperName>
+            <masterLabel>Agent Router</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Ask for clarification when the request is unclear</description>
+            <genAiPluginInstructions>
+                <description>You are the field partner for a cardiology sales rep whose territory has very high heart failure, hypertension and ASCVD prevalence, few cardiologists and long rural drive times. You help the rep see where the GDMT gap is largest, choose the right message for each HCP type, find access resources, and plan an efficient route.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002w5So</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002w5So</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>ambiguous_question</localDeveloperName>
+            <masterLabel>Ambiguous Question</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Classify a question as on-label, off-label, adverse event or promotional claim and give the compliant way to respond</description>
+            <genAiPluginInstructions>
+                <description>You are the field partner for a cardiology sales rep whose territory has very high heart failure, hypertension and ASCVD prevalence, few cardiologists and long rural drive times. You help the rep see where the GDMT gap is largest, choose the right message for each HCP type, find access resources, and plan an efficient route.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002w5Ss</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002w5Ss</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>check</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Classifies the question and returns the compliant response and escalation steps.</description>
+                <invocationTarget>PPComplianceAction</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>check</localDeveloperName>
+                <masterLabel>Check</masterLabel>
+            </localActions>
+            <localDeveloperName>compliance_check</localDeveloperName>
+            <masterLabel>Compliance Check</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Redirect off-topic requests</description>
+            <genAiPluginInstructions>
+                <description>You are the field partner for a cardiology sales rep whose territory has very high heart failure, hypertension and ASCVD prevalence, few cardiologists and long rural drive times. You help the rep see where the GDMT gap is largest, choose the right message for each HCP type, find access resources, and plan an efficient route.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002w5Sr</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002w5Sr</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>off_topic</localDeveloperName>
+            <masterLabel>Off Topic</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Show the opportunity matrix (disease burden versus GDMT gap), talk tracks by HCP type, access resources and a suggested route for the territory or one account</description>
+            <genAiPluginInstructions>
+                <description>You are the field partner for a cardiology sales rep whose territory has very high heart failure, hypertension and ASCVD prevalence, few cardiologists and long rural drive times. You help the rep see where the GDMT gap is largest, choose the right message for each HCP type, find access resources, and plan an efficient route.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002w5Sn</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002w5Sn</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>build_card</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Returns the regional opportunity card for the territory or one account, with talk tracks by HCP type, access resources and one-tap actions. The output is always renderable; always use show_command to display it.</description>
+                <invocationTarget>PPRegionalOpportunityAction</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+                <localDeveloperName>build_card</localDeveloperName>
+                <masterLabel>Build Card</masterLabel>
+                <progressIndicatorMessage>Building your Regional Opportunity...</progressIndicatorMessage>
+            </localActions>
+            <localDeveloperName>regional_opportunity</localDeveloperName>
+            <masterLabel>Regional Opportunity</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <masterLabel>PP Cardio Regional Agent</masterLabel>
+        <plannerType>Atlas__ConcurrentMultiAgentOrchestration</plannerType>
+    </planner>
+    <smallTalkEnabled>false</smallTalkEnabled>
+    <staticPromptsEnabled>false</staticPromptsEnabled>
+    <status>Inactive</status>
+    <stopRecPrompts>false</stopRecPrompts>
+    <surfacesEnabled>false</surfacesEnabled>
+    <toneType>Casual</toneType>
+    <version>2</version>
+    <welcomeMessage>Hi! I&apos;m your regional cardiology partner. Ask me where to go first this week, how to talk to a PCP versus a cardiologist, or what access options a practice has.</welcomeMessage>
+</AiAgentDefinitionVersion>

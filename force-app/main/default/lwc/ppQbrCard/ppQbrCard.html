@@ -1,0 +1,102 @@
+<template>
+    <template lwc:if={hasCard}>
+        <article class="pp-card">
+            <header class="pp-header">
+                <div class="pp-avatar"><lightning-icon icon-name="standard:event" size="small" variant="inverse"></lightning-icon></div>
+                <div class="pp-heading">
+                    <h2 class="pp-title">{card.title}</h2>
+                    <template lwc:if={card.subtitle}><p class="pp-sub">{card.subtitle}</p></template>
+                </div>
+                <template lwc:if={card.badge}><span class={badgeClass}>{card.badge}</span></template>
+            </header>
+            <template lwc:if={card.headline}><p class="pp-headline">{card.headline}</p></template>
+            <div class="pp-metrics">
+                <template for:each={metrics} for:item="m">
+                    <div key={m.key} class={m.cls}><span class="pp-metric-label">{m.label}</span><span class="pp-metric-value">{m.value}</span></div>
+                </template>
+            </div>
+
+            <template lwc:if={hasMilestones}>
+                <section class="pp-block">
+                    <h3 class="pp-block-heading">Road to the review</h3>
+                    <ol class="qb-timeline">
+                        <template for:each={milestones} for:item="m">
+                            <li key={m.key} class={m.cls}>
+                                <span class="qb-dot"></span>
+                                <span class="qb-ms-date">{m.shortDate}<span class="qb-ms-when"> {m.when}</span></span>
+                                <span class="qb-ms-label">{m.label}</span>
+                            </li>
+                        </template>
+                    </ol>
+                </section>
+            </template>
+
+            <template lwc:if={hasScorecard}>
+                <section class="pp-block">
+                    <h3 class="pp-block-heading">Scorecard vs plan</h3>
+                    <template for:each={scorecard} for:item="s">
+                        <div key={s.key} class="qb-score">
+                            <div class="qb-score-top"><span class="qb-score-name">{s.metric}</span><span class={s.chipCls}>{s.status}</span></div>
+                            <div class="qb-bar"><div class={s.fillCls} style={s.fillStyle}></div></div>
+                            <div class="qb-score-vals">{s.values} &middot; {s.pctText}</div>
+                        </div>
+                    </template>
+                </section>
+            </template>
+
+            <template lwc:if={hasDecisions}>
+                <section class="pp-block">
+                    <h3 class="pp-block-heading">Decisions needed</h3>
+                    <template for:each={decisions} for:item="d">
+                        <div key={d.key} class="qb-decision">
+                            <div class="qb-decision-text">{d.decision}</div>
+                            <div class="qb-decision-meta">{d.owner} &middot; by {d.needBy}</div>
+                            <div class="qb-decision-rec">{d.recommendation}</div>
+                            <template lwc:if={d.hasAction}>
+                                <button class={d.actionCls} data-key={d.key} disabled={d.actionDisabled} onclick={handleDecision}>{d.actionLabel}</button>
+                            </template>
+                        </div>
+                    </template>
+                </section>
+            </template>
+
+            <template lwc:if={hasLanes}>
+                <section class="pp-block">
+                    <h3 class="pp-block-heading">Actions by function</h3>
+                    <template for:each={lanes} for:item="l">
+                        <div key={l.key} class="qb-lane">
+                            <div class="qb-lane-name">{l.lane}</div>
+                            <ul class="qb-lane-list">
+                                <template for:each={l.actions} for:item="a">
+                                    <li key={a.key}>{a.text}<span class="qb-lane-meta"> {a.owner} &middot; {a.due}</span></li>
+                                </template>
+                            </ul>
+                        </div>
+                    </template>
+                </section>
+            </template>
+
+            <template for:each={sections} for:item="s">
+                <section key={s.key} class="pp-block">
+                    <h3 class="pp-block-heading">{s.heading}</h3>
+                    <ul class="pp-bullets"><template for:each={s.bullets} for:item="b"><li key={b.key}>{b.text}</li></template></ul>
+                </section>
+            </template>
+            <template lwc:if={card.nextStep}>
+                <div class="pp-next">
+                    <lightning-icon icon-name="utility:target" size="xx-small"></lightning-icon>
+                    <div><span class="pp-next-label">Next step</span><span class="pp-next-value">{card.nextStep}</span></div>
+                </div>
+            </template>
+            <template lwc:if={hasActions}>
+                <div class="pp-actions">
+                    <template for:each={actions} for:item="a">
+                        <button key={a.key} class={a.cls} data-key={a.key} disabled={a.disabled} onclick={handleAction}>{a.label}</button>
+                    </template>
+                </div>
+            </template>
+            <template lwc:if={message}><p class="pp-message">{message}</p></template>
+        </article>
+    </template>
+    <template lwc:else><div class="pp-empty">Nothing to show yet.</div></template>
+</template>

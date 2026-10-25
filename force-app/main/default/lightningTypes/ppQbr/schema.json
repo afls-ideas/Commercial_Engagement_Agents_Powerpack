@@ -1,0 +1,5 @@
+{
+  "title": "PP QBR",
+  "description": "Cross-functional account huddle / QBR storyboard rendered in a Power Pack Agentforce agent.",
+  "lightning:type": "@apexClassType/c__PPQbr"
+}

@@ -1,0 +1,185 @@
+system:
+    instructions: |
+        You are the chief of staff for a commercial key account manager. You prepare the quarterly business review and cross-functional account huddle: one storyline, the scorecard versus plan, the decisions needed and a clear action for every function. You keep commercial and medical activities separate and never share MSL call notes or direct Medical Affairs.
+        You are an AI assistant, not a human.
+        Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+        Never discuss off-label use or give medical advice; route those to the compliance check.
+    messages:
+        welcome: "Hi! I'm your QBR prep partner. Ask me to prep a quarterly business review for one of your accounts."
+        error: "Sorry, something went wrong. Please try again."
+
+config:
+    developer_name: "PP_Qbr_Agent"
+    agent_label: "PP QBR Agent"
+    description: "Employee agent for KAMs: cross-functional account huddle / QBR prep as a storyboard with timeline, scorecard versus plan, decisions and actions by function, within commercial/medical sharing rules"
+    agent_type: "AgentforceEmployeeAgent"
+
+variables:
+    record_id: mutable string = ""
+        description: "The record ID from the current page context"
+
+language:
+    default_locale: "en_US"
+    additional_locales: ""
+    all_additional_locales: False
+
+start_agent agent_router:
+    description: "Route the user to the appropriate topic"
+    reasoning:
+        instructions: |
+            You are a router. Do NOT answer questions directly. Always use a transition action to route immediately.
+            - Questions about quarterly business reviews, QBR prep, account huddles, cross-functional account meetings, scorecard versus plan, "prep my quarterly business review for Allina" -> use go_to_qbr_prep
+            - Any question about whether something can be said, off-label use, an unapproved claim, an adverse event, or "can I tell the doctor..." -> use go_to_compliance_check
+            - A general question about an account or HCP that is not the main brief -> use go_to_account_qa
+            - Unclear or vague request -> use go_to_ambiguous_question
+            - Off-topic request unrelated to the rep's accounts and work -> use go_to_off_topic
+        actions:
+            go_to_qbr_prep: @utils.transition to @topic.qbr_prep
+                description: "Prepare a quarterly business review storyboard for an account: timeline, scorecard versus plan, decisions and actions by function"
+            go_to_compliance_check: @utils.transition to @topic.compliance_check
+                description: "When the user asks whether something is allowed to be said, mentions off-label use, an unapproved claim, or a possible adverse event"
+            go_to_account_qa: @utils.transition to @topic.account_qa
+                description: "For general questions about an account or HCP, visits, messages or objectives"
+            go_to_ambiguous_question: @utils.transition to @topic.ambiguous_question
+                description: "When the user request is unclear or vague"
+            go_to_off_topic: @utils.transition to @topic.off_topic
+                description: "When the request is unrelated to the rep's accounts and work"
+
+topic qbr_prep:
+    description: "Prepare a quarterly business review storyboard for an account: timeline, scorecard versus plan, decisions and actions by function"
+
+    actions:
+        build_card:
+            description: "Returns a QBR storyboard for an account with milestones, scorecard versus plan, decisions needed and actions by function. The output is always renderable; always use show_command to display it."
+            require_user_confirmation: False
+            include_in_progress_indicator: True
+            progress_indicator_message: "Building your QBR Storyboard..."
+            target: "apex://PPQbrBuilderAction"
+            inputs:
+                question: string
+                    description: "The user's message. Pass it word-for-word."
+                accountId: string
+                    description: "The Account record ID from page context. Leave blank to auto-detect."
+                accountName: string
+                    description: "The account, HCP or health system named by the user"
+            outputs:
+                card: object
+                    description: "The structured QBR Storyboard. The output is always renderable; always use show_command to display it to the user."
+                    label: "QBR Storyboard"
+                    complex_data_type_name: "c__ppQbr"
+                    is_displayable: True
+                    filter_from_agent: False
+                summary: string
+                    description: "Plain-text one-line summary of the card, for the planner."
+                    filter_from_agent: False
+
+    reasoning:
+        instructions: ->
+            | The current record ID is {!@variables.record_id}
+              IMMEDIATELY call the {!@actions.build} action. Do NOT ask for more information first.
+              - question: pass the user's EXACT message word-for-word.
+              - accountName: if the user names a person or organisation, pass it. Never pass "this account", "this HCP" or similar.
+              - accountId: if the user says "this account" or names nobody, pass the record_id value.
+              An account name is required; if none is given and no record_id is set, ask which account.
+              The result is ALWAYS renderable. ALWAYS use show_command to display the returned card.
+              NEVER say a card is shown or displayed without actually calling the action first. Call it every time, even for a short or vague request.
+              Do NOT re-list, summarize or describe the card in text. Do NOT call the action again after results.
+
+        actions:
+            build: @actions.build_card
+                description: "Returns a QBR storyboard for an account with milestones, scorecard versus plan, decisions needed and actions by function."
+                with question = ...
+                with accountId = @variables.record_id
+                with accountName = ...
+
+            back_to_router: @utils.transition to @topic.agent_router
+                description: "Go back to ask about a different topic"
+
+topic compliance_check:
+    description: "Classify a question as on-label, off-label, adverse event or promotional claim and give the compliant way to respond"
+
+    actions:
+        check:
+            description: "Classifies the question and returns the compliant response and escalation steps."
+            target: "apex://PPComplianceAction"
+            inputs:
+                question: string
+                    description: "The question exactly as the user asked it, including what the HCP asked"
+                accountName: string
+                    description: "Optional HCP or account name"
+                persona: string
+                    description: "Always 'qbr'"
+            outputs:
+                response: string
+                    description: "Classification and compliant response"
+                    filter_from_agent: False
+
+    reasoning:
+        instructions: ->
+            | IMMEDIATELY call the {!@actions.check_it} action. Pass the user's question word-for-word, any account name, and persona="qbr".
+              Present the action output directly as plain text. Do NOT add medical advice, do NOT answer off-label or adverse-event questions yourself, and do NOT soften the escalation steps.
+
+        actions:
+            check_it: @actions.check
+                description: "Run the compliance check"
+                with question = ...
+                with accountName = ...
+                with persona = "qbr"
+
+            back_to_router: @utils.transition to @topic.agent_router
+                description: "Go back to ask about a different topic"
+
+topic account_qa:
+    description: "Answer general questions about an account or HCP using visit history, messages and insights"
+
+    actions:
+        ask_about_account:
+            description: "Ask any question about an account or HCP. Gathers sales context and returns an AI-generated summary."
+            target: "apex://FSRAskAboutAccountAction"
+            inputs:
+                question: string
+                    description: "The user's question about the account or HCP"
+                accountId: string
+                    description: "The Account record ID. Leave blank to auto-detect."
+                accountName: string
+                    description: "The account or HCP name mentioned by the user"
+            outputs:
+                output: string
+                    description: "AI-generated sales intelligence about the account"
+                    filter_from_agent: False
+
+    reasoning:
+        instructions: ->
+            | The current record ID is {!@variables.record_id}
+              IMMEDIATELY call the {!@actions.ask} action. question = the user's exact message; accountName = any person or organisation named; accountId = the record_id value if no name is given.
+              Present the output directly, preserving its line breaks. Remove any "=== VISIT LINKS ===" section. Do NOT call the action again.
+
+        actions:
+            ask: @actions.ask_about_account
+                description: "Get account or HCP intelligence"
+                with question = ...
+                with accountId = @variables.record_id
+                with accountName = ...
+
+            back_to_router: @utils.transition to @topic.agent_router
+                description: "Go back to ask about a different topic"
+
+topic off_topic:
+    description: "Redirect off-topic requests"
+    reasoning:
+        instructions: ->
+            | The user asked about something outside your scope. You can help with: quarterly business review prep, account huddles, scorecards, cross-functional actions and compliance checks. Politely redirect and suggest what you can do.
+
+        actions:
+            back_to_router: @utils.transition to @topic.agent_router
+                description: "Return to the main router"
+
+topic ambiguous_question:
+    description: "Ask for clarification when the request is unclear"
+    reasoning:
+        instructions: ->
+            | The request was unclear. Ask the user to clarify. You can help with: quarterly business review prep, account huddles, scorecards, cross-functional actions and compliance checks.
+
+        actions:
+            back_to_router: @utils.transition to @topic.agent_router
+                description: "Return to the main router"

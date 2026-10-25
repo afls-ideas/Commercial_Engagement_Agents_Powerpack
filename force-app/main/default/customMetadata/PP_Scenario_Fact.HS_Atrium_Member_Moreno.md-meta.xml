@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>HS Atrium Member Moreno</label>
+    <protected>false</protected>
+    <values>
+        <field>Account_Name__c</field>
+        <value xsi:type="xsd:string">Atrium Health</value>
+    </values>
+    <values>
+        <field>Category__c</field>
+        <value xsi:type="xsd:string">Committee member</value>
+    </values>
+    <values>
+        <field>Fact__c</field>
+        <value xsi:type="xsd:string">MEMBER: Dr. Isabel Moreno | ROLE: Pathways committee chair | COMMITTEE: Hematology Pathway Council | VOTES: yes | STANCE: Champion | POSITION: 75 (scale -100 opposed to +100 champion) | INFLUENCE: 90 (0-100)</value>
+    </values>
+    <values>
+        <field>Persona__c</field>
+        <value xsi:type="xsd:string">health_system</value>
+    </values>
+</CustomMetadata>

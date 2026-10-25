@@ -1,0 +1,5 @@
+{
+  "title": "PP Whitespace Map",
+  "description": "Whitespace bubble matrix rendered in a Power Pack Agentforce agent.",
+  "lightning:type": "@apexClassType/c__PPWhitespaceMap"
+}

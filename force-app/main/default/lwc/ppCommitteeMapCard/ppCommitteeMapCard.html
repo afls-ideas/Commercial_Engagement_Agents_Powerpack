@@ -1,0 +1,118 @@
+<template>
+    <template lwc:if={hasCard}>
+        <article class="pp-card">
+            <header class="pp-header">
+                <div class="pp-avatar"><lightning-icon icon-name="standard:groups" size="small" variant="inverse"></lightning-icon></div>
+                <div class="pp-heading">
+                    <h2 class="pp-title">{card.title}</h2>
+                    <template lwc:if={card.subtitle}><p class="pp-sub">{card.subtitle}</p></template>
+                </div>
+                <template lwc:if={card.badge}><span class={badgeClass}>{card.badge}</span></template>
+            </header>
+            <template lwc:if={card.headline}><p class="pp-headline">{card.headline}</p></template>
+
+            <div class="pp-metrics">
+                <template for:each={metrics} for:item="m">
+                    <div key={m.key} class="pp-metric pp-tone-neutral">
+                        <span class="pp-metric-label">{m.label}</span>
+                        <span class="pp-metric-value">{m.value}</span>
+                    </div>
+                </template>
+            </div>
+
+            <template lwc:if={hasMembers}>
+                <section class="pp-block">
+                    <h3 class="pp-block-heading">Who decides: position vs influence</h3>
+                    <svg class="cm-chart" viewBox={viewBox} role="group" aria-label="Committee members by position and influence">
+                        <rect class="cm-q cm-q-good" x={midX} y={plotTop} width={halfW} height={halfH}></rect>
+                        <rect class="cm-q cm-q-risk" x={plotLeft} y={plotTop} width={halfW} height={halfH}></rect>
+                        <line class="cm-axis" x1={plotLeft} y1={plotBottom} x2={plotRight} y2={plotBottom}></line>
+                        <line class="cm-axis" x1={plotLeft} y1={plotTop} x2={plotLeft} y2={plotBottom}></line>
+                        <line class="cm-mid" x1={midX} y1={plotTop} x2={midX} y2={plotBottom}></line>
+                        <line class="cm-mid" x1={plotLeft} y1={midY} x2={plotRight} y2={midY}></line>
+                        <text class="cm-label" x={plotLeft} y={labelBottomY}>Opposed</text>
+                        <text class="cm-label" x={midX} y={labelBottomY} text-anchor="middle">Neutral</text>
+                        <text class="cm-label" x={labelRightX} y={labelBottomY} text-anchor="end">Champion</text>
+                        <text class="cm-label" x="9" y={axisYLabelY} text-anchor="middle" transform={axisYLabelTransform}>Influence</text>
+                        <text class="cm-quad-label" x={plotLeft} y="24" dx="4">Address concerns</text>
+                        <text class="cm-quad-label" x={labelRightX} y="24" dx="-4" text-anchor="end">Leverage</text>
+                        <template for:each={members} for:item="m">
+                            <g key={m.key} class={m.gCls} transform={m.transform} data-idx={m.idx} tabindex="0" role="button" aria-label={m.aria}
+                               onclick={handleSelect} onkeydown={handleKey}>
+                                <circle class="cm-dot" r={m.r}></circle>
+                                <text class="cm-initials" text-anchor="middle" dy="3.5">{m.initials}</text>
+                            </g>
+                        </template>
+                    </svg>
+                    <div class="cm-legend">
+                        <span class="cm-key cm-key-champion">Champion</span><span class="cm-key cm-key-supporter">Supporter</span>
+                        <span class="cm-key cm-key-neutral">Neutral</span><span class="cm-key cm-key-skeptic">Skeptic</span>
+                        <span class="cm-key cm-key-blocker">Blocker</span><span class="cm-key-note">Dashed = advisory, no vote</span>
+                    </div>
+                </section>
+
+                <template lwc:if={selected}>
+                    <section class="cm-detail" aria-live="polite">
+                        <div class="cm-detail-top">
+                            <div>
+                                <div class="cm-detail-name">
+                                    <template lwc:if={selected.recordId}><a href="#" class="cm-link" onclick={handleOpenMember}>{selected.name}</a></template>
+                                    <template lwc:else>{selected.name}</template>
+                                </div>
+                                <div class="cm-detail-role">{selected.role}</div>
+                            </div>
+                            <span class={selected.chipCls}>{selected.stance}</span>
+                        </div>
+                        <p class="cm-meta">{selected.committee} &middot; {selected.voterLabel} &middot; Last contact {selected.lastContact}</p>
+                        <dl class="cm-notes">
+                            <dt>Wants</dt><dd>{selected.wants}</dd>
+                            <dt>Thinks</dt><dd>{selected.thinks}</dd>
+                            <dt>Approach</dt><dd>{selected.approach}</dd>
+                        </dl>
+                        <template lwc:if={selected.action}>
+                            <button class={selectedActionCls} disabled={selectedActionDisabled} onclick={handleMemberAction}>{selectedActionLabel}</button>
+                        </template>
+                    </section>
+                </template>
+
+                <ul class="cm-list">
+                    <template for:each={members} for:item="m">
+                        <li key={m.key} class={m.rowCls} data-idx={m.idx} tabindex="0" role="button" onclick={handleSelect} onkeydown={handleKey}>
+                            <span class={m.gCls}><span class="cm-swatch"></span></span>
+                            <span class="cm-row-name">{m.name}<span class="cm-row-role"> {m.role}</span></span>
+                            <span class={m.chipCls}>{m.stance}</span>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+
+            <template for:each={sections} for:item="s">
+                <section key={s.key} class="pp-block">
+                    <h3 class="pp-block-heading">{s.heading}</h3>
+                    <ul class="pp-bullets">
+                        <template for:each={s.bullets} for:item="b"><li key={b.key}>{b.text}</li></template>
+                    </ul>
+                </section>
+            </template>
+
+            <template lwc:if={card.nextStep}>
+                <div class="pp-next">
+                    <lightning-icon icon-name="utility:target" size="xx-small"></lightning-icon>
+                    <div><span class="pp-next-label">Next step</span><span class="pp-next-value">{card.nextStep}</span></div>
+                </div>
+            </template>
+
+            <template lwc:if={hasActions}>
+                <div class="pp-actions">
+                    <template for:each={actions} for:item="a">
+                        <button key={a.key} class={a.cls} data-key={a.key} disabled={a.disabled} onclick={handleAction}>{a.label}</button>
+                    </template>
+                </div>
+            </template>
+            <template lwc:if={message}><p class="pp-message">{message}</p></template>
+        </article>
+    </template>
+    <template lwc:else>
+        <div class="pp-empty">Nothing to show yet.</div>
+    </template>
+</template>

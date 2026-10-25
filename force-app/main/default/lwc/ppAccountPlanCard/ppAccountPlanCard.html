@@ -1,0 +1,100 @@
+<template>
+    <template lwc:if={hasCard}>
+        <article class="pp-card">
+            <header class="pp-header">
+                <div class="pp-avatar"><lightning-icon icon-name="standard:account_plan" size="small" variant="inverse"></lightning-icon></div>
+                <div class="pp-heading">
+                    <h2 class="pp-title">{card.title}</h2>
+                    <template lwc:if={card.subtitle}><p class="pp-sub">{card.subtitle}</p></template>
+                </div>
+                <template lwc:if={card.badge}><span class={badgeClass}>{card.badge}</span></template>
+            </header>
+            <template lwc:if={card.headline}><p class="pp-headline">{card.headline}</p></template>
+
+            <template lwc:if={hasHealth}>
+                <div class="ap-health">
+                    <svg class="ap-gauge" viewBox="0 0 140 82" role="img" aria-label="Plan health">
+                        <path class="ap-gauge-track" d={gaugePath}></path>
+                        <path class={gaugeCls} d={gaugePath} stroke-dasharray={gaugeDash}></path>
+                        <text class="ap-gauge-num" x="70" y="62" text-anchor="middle">{health}</text>
+                        <text class="ap-gauge-cap" x="70" y="76" text-anchor="middle">plan health</text>
+                    </svg>
+                    <div class="ap-health-txt"><span class="pp-metric-label">Objectives</span><span class="pp-metric-value">{card.healthSummary}</span></div>
+                </div>
+            </template>
+
+            <section class="pp-block">
+                <h3 class="pp-block-heading">Goal tree</h3>
+                <ul class="ap-tree">
+                    <template for:each={objectives} for:item="o">
+                        <li key={o.key} class={o.nodeCls}>
+                            <div class="ap-obj-top">
+                                <span class="ap-obj-title">{o.title}</span>
+                                <span class={o.chipCls}>{o.status}</span>
+                            </div>
+                            <p class="ap-obj-meta">{o.owner} &middot; due {o.due}</p>
+                            <div class="ap-kpi">
+                                <span class="ap-kpi-name">{o.kpi}</span>
+                                <span class="ap-kpi-vals">{o.baseline} &rarr; <b>{o.actual}</b> &rarr; {o.target}</span>
+                            </div>
+                            <div class="pp-bar" role="progressbar" aria-valuenow={o.progress} aria-valuemin="0" aria-valuemax="100">
+                                <div class={o.fillCls} style={o.fillStyle}></div>
+                            </div>
+                            <p class="ap-pct">{o.pct} of the way to target</p>
+                            <div class="ap-obj-bottom">
+                                <template lwc:if={o.hasInitiatives}>
+                                    <button class="ap-toggle" data-idx={o.idx} aria-expanded={o.isOpen} onclick={handleToggle}>{o.toggleLabel}</button>
+                                </template>
+                                <template lwc:if={o.action}>
+                                    <button class={o.actionCls} data-idx={o.idx} disabled={o.actionDisabled} onclick={handleObjAction}>{o.actionLabel}</button>
+                                </template>
+                            </div>
+                            <template lwc:if={o.isOpen}>
+                                <ul class="ap-kids">
+                                    <template for:each={o.kids} for:item="k"><li key={k.key}>{k.text}</li></template>
+                                </ul>
+                            </template>
+                        </li>
+                    </template>
+                </ul>
+            </section>
+
+            <template lwc:if={hasSwot}>
+                <section class="pp-block">
+                    <h3 class="pp-block-heading">SWOT</h3>
+                    <div class="ap-swot-grid">
+                        <template for:each={swot} for:item="s">
+                            <div key={s.key} class={s.cls}>
+                                <h4 class="ap-swot-h">{s.heading}</h4>
+                                <ul class="pp-bullets"><template for:each={s.bullets} for:item="b"><li key={b.key}>{b.text}</li></template></ul>
+                            </div>
+                        </template>
+                    </div>
+                </section>
+            </template>
+
+            <template for:each={sections} for:item="s">
+                <section key={s.key} class="pp-block">
+                    <h3 class="pp-block-heading">{s.heading}</h3>
+                    <ul class="pp-bullets"><template for:each={s.bullets} for:item="b"><li key={b.key}>{b.text}</li></template></ul>
+                </section>
+            </template>
+
+            <template lwc:if={card.nextStep}>
+                <div class="pp-next">
+                    <lightning-icon icon-name="utility:target" size="xx-small"></lightning-icon>
+                    <div><span class="pp-next-label">Next step</span><span class="pp-next-value">{card.nextStep}</span></div>
+                </div>
+            </template>
+            <template lwc:if={hasActions}>
+                <div class="pp-actions">
+                    <template for:each={actions} for:item="a">
+                        <button key={a.key} class={a.cls} data-key={a.key} disabled={a.disabled} onclick={handleAction}>{a.label}</button>
+                    </template>
+                </div>
+            </template>
+            <template lwc:if={message}><p class="pp-message">{message}</p></template>
+        </article>
+    </template>
+    <template lwc:else><div class="pp-empty">Nothing to show yet.</div></template>
+</template>

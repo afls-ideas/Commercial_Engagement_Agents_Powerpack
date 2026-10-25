@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AiAgentDefinitionVersion xmlns="http://soap.sforce.com/2006/04/metadata">
+    <articleAnswersGPTEnabled>false</articleAnswersGPTEnabled>
+    <billingMode>ActionBased</billingMode>
+    <citationsEnabled>false</citationsEnabled>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The agent instructions</description>
+        <developerName>AgentScriptInternal_agent_instructions</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Agent Instructions</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The next topic to be visited</description>
+        <developerName>AgentScriptInternal_next_topic</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Next Topic</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The record ID from the current page context</description>
+        <developerName>record_id</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Record Id</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <copilotPrimaryLanguage>en_US</copilotPrimaryLanguage>
+    <genAiPlannerName>PP_Rare_Disease_Agent_v1</genAiPlannerName>
+    <isScriptCompatibleAgent>true</isScriptCompatibleAgent>
+    <knowledgeActionEnabled>false</knowledgeActionEnabled>
+    <knowledgeFallbackEnabled>false</knowledgeFallbackEnabled>
+    <planner>
+        <fullName>PP_Rare_Disease_Agent_v1</fullName>
+        <agentGraphRef>20ZgL00000BAAhJ</agentGraphRef>
+        <description>Employee agent for rare-disease hematology and neurology reps: diagnostic-journey awareness, expert-center referral routes and approved disease-awareness materials</description>
+        <localTopicLinks>
+            <genAiPluginName>account_qa</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>agent_router</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>ambiguous_question</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>compliance_check</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>diagnostic_journey</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>off_topic</genAiPluginName>
+        </localTopicLinks>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Answer general questions about an account or HCP using visit history, messages and insights</description>
+            <genAiPluginInstructions>
+                <description>You are the field partner for a rare-disease sales representative covering hematologists and neurologists. You help the rep recognise where disease awareness can shorten the diagnostic journey, connect HCPs to expert centers and approved awareness materials, and never discuss individual patients or suggest a diagnosis.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002w51P</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002w51P</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>ask_about_account</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Ask any question about an account or HCP. Gathers sales context and returns an AI-generated summary.</description>
+                <invocationTarget>FSRAskAboutAccountAction</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>ask_about_account</localDeveloperName>
+                <masterLabel>Ask About Account</masterLabel>
+            </localActions>
+            <localDeveloperName>account_qa</localDeveloperName>
+            <masterLabel>Account Qa</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Route the user to the appropriate topic</description>
+            <genAiPluginInstructions>
+                <description>You are the field partner for a rare-disease sales representative covering hematologists and neurologists. You help the rep recognise where disease awareness can shorten the diagnostic journey, connect HCPs to expert centers and approved awareness materials, and never discuss individual patients or suggest a diagnosis.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002w51N</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002w51N</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>agent_router</localDeveloperName>
+            <masterLabel>Agent Router</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Ask for clarification when the request is unclear</description>
+            <genAiPluginInstructions>
+                <description>You are the field partner for a rare-disease sales representative covering hematologists and neurologists. You help the rep recognise where disease awareness can shorten the diagnostic journey, connect HCPs to expert centers and approved awareness materials, and never discuss individual patients or suggest a diagnosis.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002w51O</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002w51O</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>ambiguous_question</localDeveloperName>
+            <masterLabel>Ambiguous Question</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Classify a question as on-label, off-label, adverse event or promotional claim and give the compliant way to respond</description>
+            <genAiPluginInstructions>
+                <description>You are the field partner for a rare-disease sales representative covering hematologists and neurologists. You help the rep recognise where disease awareness can shorten the diagnostic journey, connect HCPs to expert centers and approved awareness materials, and never discuss individual patients or suggest a diagnosis.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002w51S</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002w51S</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>check</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Classifies the question and returns the compliant response and escalation steps.</description>
+                <invocationTarget>PPComplianceAction</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>check</localDeveloperName>
+                <masterLabel>Check</masterLabel>
+            </localActions>
+            <localDeveloperName>compliance_check</localDeveloperName>
+            <masterLabel>Compliance Check</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Show where an HCP or the whole territory can help shorten the diagnostic journey, the expert-center referral route and the right approved awareness material</description>
+            <genAiPluginInstructions>
+                <description>You are the field partner for a rare-disease sales representative covering hematologists and neurologists. You help the rep recognise where disease awareness can shorten the diagnostic journey, connect HCPs to expert centers and approved awareness materials, and never discuss individual patients or suggest a diagnosis.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002w51Q</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002w51Q</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>build_card</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Returns the diagnostic-journey card for an HCP or for the whole territory, with expert-center referral route, approved awareness material and one-tap next actions. The output is always renderable; always use show_command to display it.</description>
+                <invocationTarget>PPDiagnosticJourneyAction</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+                <localDeveloperName>build_card</localDeveloperName>
+                <masterLabel>Build Card</masterLabel>
+                <progressIndicatorMessage>Building your Diagnostic Journey...</progressIndicatorMessage>
+            </localActions>
+            <localDeveloperName>diagnostic_journey</localDeveloperName>
+            <masterLabel>Diagnostic Journey</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Redirect off-topic requests</description>
+            <genAiPluginInstructions>
+                <description>You are the field partner for a rare-disease sales representative covering hematologists and neurologists. You help the rep recognise where disease awareness can shorten the diagnostic journey, connect HCPs to expert centers and approved awareness materials, and never discuss individual patients or suggest a diagnosis.
+You are an AI assistant, not a human.
+Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
+Never discuss off-label use or give medical advice; route those to the compliance check.</description>
+                <developerName>instruction0_179gL000002w51R</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179gL000002w51R</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>off_topic</localDeveloperName>
+            <masterLabel>Off Topic</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <masterLabel>PP Rare Disease Agent</masterLabel>
+        <plannerType>Atlas__ConcurrentMultiAgentOrchestration</plannerType>
+    </planner>
+    <smallTalkEnabled>false</smallTalkEnabled>
+    <staticPromptsEnabled>false</staticPromptsEnabled>
+    <status>Inactive</status>
+    <stopRecPrompts>false</stopRecPrompts>
+    <surfacesEnabled>false</surfacesEnabled>
+    <toneType>Casual</toneType>
+    <version>1</version>
+    <welcomeMessage>Hi! I&apos;m your rare-disease field partner. Ask me where awareness can shorten diagnosis in your territory, how to brief an HCP, or which expert center to point them to.</welcomeMessage>
+</AiAgentDefinitionVersion>

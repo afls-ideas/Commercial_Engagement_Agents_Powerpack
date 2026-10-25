@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>AP Allina Context</label>
+    <protected>false</protected>
+    <values>
+        <field>Account_Name__c</field>
+        <value xsi:type="xsd:string">Allina Health</value>
+    </values>
+    <values>
+        <field>Category__c</field>
+        <value xsi:type="xsd:string">Plan guidance</value>
+    </values>
+    <values>
+        <field>Fact__c</field>
+        <value xsi:type="xsd:string">PLAN YEAR: 2027 (Jan-Dec). ACCOUNT: Allina Health IDN, integrated delivery network, 13 hospitals and about 90 clinics, Minneapolis-St. Paul. Our franchise here: Immunonco (relapsed myeloma) and CardioSeal TAVR. KAM: Maria Salinas. Executive sponsor:</value>
+    </values>
+    <values>
+        <field>Persona__c</field>
+        <value xsi:type="xsd:string">account_plan</value>
+    </values>
+</CustomMetadata>

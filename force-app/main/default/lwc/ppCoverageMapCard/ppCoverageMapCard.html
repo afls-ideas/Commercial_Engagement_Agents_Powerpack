@@ -1,0 +1,95 @@
+<template>
+    <template lwc:if={hasCard}>
+        <article class="pp-card">
+            <header class="pp-header">
+                <div class="pp-avatar"><lightning-icon icon-name="standard:team_member" size="small" variant="inverse"></lightning-icon></div>
+                <div class="pp-heading">
+                    <h2 class="pp-title">{card.title}</h2>
+                    <template lwc:if={card.subtitle}><p class="pp-sub">{card.subtitle}</p></template>
+                </div>
+                <template lwc:if={card.badge}><span class={badgeClass}>{card.badge}</span></template>
+            </header>
+            <template lwc:if={card.headline}><p class="pp-headline">{card.headline}</p></template>
+            <div class="pp-metrics">
+                <template for:each={metrics} for:item="m">
+                    <div key={m.key} class={m.cls}><span class="pp-metric-label">{m.label}</span><span class="pp-metric-value">{m.value}</span></div>
+                </template>
+            </div>
+
+            <template lwc:if={hasNodes}>
+                <section class="pp-block">
+                    <h3 class="pp-block-heading">Who reports to whom, and how well we know them</h3>
+                    <svg class="cm-chart" viewBox={viewBox} role="group" aria-label="Stakeholder network">
+                        <template for:each={edges} for:item="e">
+                            <line key={e.key} class="cv-edge" x1={e.x1} y1={e.y1} x2={e.x2} y2={e.y2}></line>
+                        </template>
+                        <template for:each={nodes} for:item="n">
+                            <g key={n.key} class={n.gCls} transform={n.transform} data-idx={n.idx} tabindex="0" role="button" aria-label={n.aria}
+                               onclick={handleSelect} onkeydown={handleKey}>
+                                <circle class="cv-ring" r="19" stroke-width={n.ringW}></circle>
+                                <circle class="cv-core" r="13"></circle>
+                                <text class="cv-initials" text-anchor="middle" dy="3.5">{n.initials}</text>
+                                <text class="cv-name" text-anchor="middle" y="33">{n.short}</text>
+                            </g>
+                        </template>
+                    </svg>
+                    <div class="cv-legend">
+                        <span class="cv-key cv-k-covered">Covered</span><span class="cv-key cv-k-cooling">Cooling</span><span class="cv-key cv-k-gap">Gap</span>
+                        <span class="cv-note">Ring thickness = relationship strength. Rows: executive, decision maker, influencer, user.</span>
+                    </div>
+                </section>
+
+                <template lwc:if={selected}>
+                    <section class="cm-detail" aria-live="polite">
+                        <div class="cm-detail-top">
+                            <div>
+                                <div class="cm-detail-name">
+                                    <template lwc:if={selected.recordId}><a href="#" class="cm-link" onclick={handleOpen}>{selected.name}</a></template>
+                                    <template lwc:else>{selected.name}</template>
+                                </div>
+                                <div class="cm-detail-role">{selected.role}</div>
+                            </div>
+                            <span class={selected.chipCls}>{selected.status}</span>
+                        </div>
+                        <p class="cm-meta">{selected.tier} &middot; Strength {selected.strength} &middot; Last contact {selected.since} &middot; Owner {selected.owner}</p>
+                        <p class="cv-note-txt">{selected.note}</p>
+                        <template lwc:if={selected.action}>
+                            <button class={selected.actionCls} disabled={selected.actionDisabled} onclick={handleSelAction}>{selected.actionLabel}</button>
+                        </template>
+                    </section>
+                </template>
+
+                <ul class="cm-list">
+                    <template for:each={nodes} for:item="n">
+                        <li key={n.key} class={n.rowCls} data-idx={n.idx} tabindex="0" role="button" onclick={handleSelect} onkeydown={handleKey}>
+                            <span class="cm-row-name">{n.name}<span class="cm-row-role"> {n.since}</span></span>
+                            <span class={n.chipCls}>{n.status}</span>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+
+            <template for:each={sections} for:item="s">
+                <section key={s.key} class="pp-block">
+                    <h3 class="pp-block-heading">{s.heading}</h3>
+                    <ul class="pp-bullets"><template for:each={s.bullets} for:item="b"><li key={b.key}>{b.text}</li></template></ul>
+                </section>
+            </template>
+            <template lwc:if={card.nextStep}>
+                <div class="pp-next">
+                    <lightning-icon icon-name="utility:target" size="xx-small"></lightning-icon>
+                    <div><span class="pp-next-label">Next step</span><span class="pp-next-value">{card.nextStep}</span></div>
+                </div>
+            </template>
+            <template lwc:if={hasActions}>
+                <div class="pp-actions">
+                    <template for:each={actions} for:item="a">
+                        <button key={a.key} class={a.cls} data-key={a.key} disabled={a.disabled} onclick={handleAction}>{a.label}</button>
+                    </template>
+                </div>
+            </template>
+            <template lwc:if={message}><p class="pp-message">{message}</p></template>
+        </article>
+    </template>
+    <template lwc:else><div class="pp-empty">Nothing to show yet.</div></template>
+</template>
