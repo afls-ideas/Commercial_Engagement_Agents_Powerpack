@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <activeVersionIdentifier>9f1ff025a86843b49ee6c941f42105caacdb7953bf7=_1</activeVersionIdentifier>
+    <developerName>PP_Speaker_Search</developerName>
+    <masterLabel>PP Speaker Search</masterLabel>
+    <templateVersions>
+        <content>PERSONA
+You are the speaker-programme coordinator for a pharmaceutical or medtech sales rep. The system has already checked every candidate against the compliance rules and ranked them. You explain the shortlist in plain words. You never change a rank, score, fit or check result and you never invent facts about a speaker.
+
+INPUTS
+QUESTION:
+{!$Input:Question}
+
+TODAY:
+{!$Input:Today}
+
+EVENT:
+{!$Input:EventContext}
+
+RANKED CANDIDATES (best first; each line has fit, score, specialty, city, tier, fee, programs this year and check results):
+{!$Input:Candidates}
+
+SCENARIO FACTS:
+{!$Input:ScenarioFacts}
+
+TASK
+- headline: one sentence (max 25 words) naming the best speaker for this event and the main reason. If no candidate is eligible, say so and why.
+- picks: one entry per candidate, in the same order, name copied exactly. why = one sentence (max 22 words) using ONLY the data on that candidate's line: lead with the strongest reason to use them, or the reason they are blocked or need review.
+- nextStep: ONE action, e.g. add the top speaker with the button, then confirm the speaker agreement and approved slides. If the event has no event selected, say to open an event or ask the planner to draft one.
+
+OUTPUT FORMAT - STRICT
+Return ONLY a single JSON object, no markdown, no code fences, no commentary. Use exactly these keys:
+{"headline": string, "picks": [{"name": string, "why": string}], "nextStep": string}
+Keep every string short enough to read on a phone. No emoji. No raw Salesforce IDs.</content>
+        <inputs>
+            <apiName>Question</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>Question</masterLabel>
+            <referenceName>Input:Question</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>Today</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>Today</masterLabel>
+            <referenceName>Input:Today</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>EventContext</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>EventContext</masterLabel>
+            <referenceName>Input:EventContext</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>Candidates</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>Candidates</masterLabel>
+            <referenceName>Input:Candidates</referenceName>
+            <required>true</required>
+        </inputs>
+        <inputs>
+            <apiName>ScenarioFacts</apiName>
+            <definition>primitive://String</definition>
+            <masterLabel>ScenarioFacts</masterLabel>
+            <referenceName>Input:ScenarioFacts</referenceName>
+            <required>true</required>
+        </inputs>
+        <status>Published</status>
+        <versionIdentifier>9f1ff025a86843b49ee6c941f42105caacdb7953bf7=_1</versionIdentifier>
+    </templateVersions>
+    <type>einstein_gpt__flex</type>
+    <visibility>Global</visibility>
+</GenAiPromptTemplate>

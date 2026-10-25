@@ -1,0 +1,62 @@
+<template>
+    <template lwc:if={hasCard}>
+        <article class="pp-card">
+            <header class="pp-header">
+                <div class="pp-avatar"><lightning-icon icon-name="standard:people" size="small" variant="inverse"></lightning-icon></div>
+                <div class="pp-heading">
+                    <h2 class="pp-title">{card.title}</h2>
+                    <template lwc:if={card.subtitle}><p class="pp-sub">{card.subtitle}</p></template>
+                </div>
+                <template lwc:if={card.badge}><span class={badgeClass}>{card.badge}</span></template>
+            </header>
+            <template lwc:if={card.headline}><p class="pp-headline">{card.headline}</p></template>
+            <template lwc:if={hasCandidates}>
+                <ul class="sp-list">
+                    <template for:each={candidates} for:item="c">
+                        <li key={c.key} class="sp-item">
+                            <div class="sp-top">
+                                <div><span class="sp-name">{c.name}</span><span class="sp-meta">{c.meta}</span></div>
+                                <span class={c.fitCls}>{c.fit} {c.score}</span>
+                            </div>
+                            <template lwc:if={c.why}><p class="sp-why">{c.why}</p></template>
+                            <ul class="ep-checks">
+                                <template for:each={c.checks} for:item="k">
+                                    <li key={k.key} class={k.cls}>
+                                        <lightning-icon icon-name={k.icon} size="xx-small"></lightning-icon>
+                                        <span><strong>{k.label}.</strong> {k.detail}</span>
+                                    </li>
+                                </template>
+                            </ul>
+                            <div class="pp-actions">
+                                <template lwc:if={c.showAdd}>
+                                    <button class="pp-btn ep-create" data-id={c.expertId} disabled={c.busy} onclick={handleAdd}>Add as speaker</button>
+                                </template>
+                                <template lwc:if={c.isIn}><span class="sp-in">On this event</span></template>
+                                <template lwc:if={c.showUndo}>
+                                    <button class="pp-btn pp-btn-escalate" data-id={c.expertId} disabled={c.busy} onclick={handleUndo}>Undo</button>
+                                </template>
+                            </div>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+            <template for:each={sections} for:item="s">
+                <section key={s.key} class="pp-block">
+                    <h3 class="pp-block-heading">{s.heading}</h3>
+                    <ul class="pp-bullets"><template for:each={s.bullets} for:item="b"><li key={b.key}>{b.text}</li></template></ul>
+                </section>
+            </template>
+            <template lwc:if={card.nextStep}>
+                <div class="pp-next">
+                    <lightning-icon icon-name="utility:target" size="xx-small"></lightning-icon>
+                    <div><span class="pp-next-label">Next step</span><span class="pp-next-value">{card.nextStep}</span></div>
+                </div>
+            </template>
+            <template lwc:if={canOpen}>
+                <div class="pp-actions"><button class="pp-btn" onclick={handleOpen}>Open event</button></div>
+            </template>
+            <template lwc:if={message}><p class="pp-message">{message}</p></template>
+        </article>
+    </template>
+    <template lwc:else><div class="pp-empty">Nothing to show yet.</div></template>
+</template>

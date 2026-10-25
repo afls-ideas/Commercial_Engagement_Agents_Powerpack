@@ -1,0 +1,5 @@
+{
+  "title": "PP Speaker Search",
+  "description": "Ranked approved speakers for an event with compliance checks and an add-as-speaker button.",
+  "lightning:type": "@apexClassType/c__PPSpeakerSearch"
+}

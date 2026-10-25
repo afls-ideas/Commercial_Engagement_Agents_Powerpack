@@ -45,11 +45,11 @@ topic {e['topic']}:
 
     reasoning:
         instructions: ->
-            | The current record ID is {{!@variables.record_id}}
+            | The current record ID is {{!@variables.currentRecordId}} (object {{!@variables.currentObjectApiName}})
               IMMEDIATELY call the {{!@actions.build}} action. Do NOT ask for more information first.
               - question: pass the user's EXACT message word-for-word.
               - accountName: if the user names a person or organisation, pass it. Never pass "this account" or similar.
-              - accountId: if the user says "this account" or names nobody, pass the record_id value.
+              - accountId: if the user says "this account" or names nobody, pass the current record ID.
               {e['instructions']}
               The result is ALWAYS renderable. ALWAYS use show_command to display the returned card.
               NEVER say a card is shown or displayed without actually calling the action first. Call it every time.
@@ -59,7 +59,7 @@ topic {e['topic']}:
             build: @actions.build_card
                 description: "{e['action_desc']}"
                 with question = ...
-                with accountId = @variables.record_id
+                with accountId = @variables.currentRecordId
                 with accountName = ...
 
             back_to_router: @utils.transition to @topic.agent_router
@@ -83,8 +83,15 @@ config:
     agent_type: "AgentforceEmployeeAgent"
 
 variables:
-    record_id: mutable string = ""
-        description: "The record ID from the current page context"
+    currentRecordId: mutable string = ""
+        visibility: "External"
+        description: "Page context: Id of the record the rep is viewing. Blank when the screen has no record."
+    currentObjectApiName: mutable string = ""
+        visibility: "External"
+        description: "Page context: API name of the object the rep is viewing, for example Account or MngEvent."
+    currentPageType: mutable string = ""
+        visibility: "External"
+        description: "Page context: type of page the rep is on, for example record."
 
 language:
     default_locale: "en_US"
@@ -96,18 +103,18 @@ start_agent agent_router:
     reasoning:
         instructions: |
             You are a router. Do NOT answer questions directly. Always use a transition action to route immediately.
-            - {s['router_main']} -> use go_to_{mt}
-{extra_router}            - Any question about whether something can be said, off-label use, an unapproved claim, an adverse event, or "can I tell the doctor..." -> use go_to_compliance_check
-            - A general question about an account or HCP that is not the main brief -> use go_to_account_qa
+{extra_router}            - {s['router_main']} -> use go_to_{mt}
+            - Any question about whether something can be said, off-label use, an unapproved claim, an adverse event, or "can I tell the doctor..." -> use go_to_compliance_check
+            - A general question about an account or HCP (never about an event or a speaker) that is not the main brief -> use go_to_account_qa
             - Unclear or vague request -> use go_to_ambiguous_question
             - Off-topic request unrelated to the rep's accounts and work -> use go_to_off_topic
         actions:
-            go_to_{mt}: @utils.transition to @topic.{mt}
+{extra_trans}            go_to_{mt}: @utils.transition to @topic.{mt}
                 description: "{s['main_topic_desc']}"
-{extra_trans}            go_to_compliance_check: @utils.transition to @topic.compliance_check
+            go_to_compliance_check: @utils.transition to @topic.compliance_check
                 description: "When the user asks whether something is allowed to be said, mentions off-label use, an unapproved claim, or a possible adverse event"
             go_to_account_qa: @utils.transition to @topic.account_qa
-                description: "For general questions about an account or HCP, visits, messages or objectives"
+                description: "For general questions about an account or HCP, visits, messages or objectives. Not for events or speakers"
             go_to_ambiguous_question: @utils.transition to @topic.ambiguous_question
                 description: "When the user request is unclear or vague"
             go_to_off_topic: @utils.transition to @topic.off_topic
@@ -143,11 +150,11 @@ topic {mt}:
 
     reasoning:
         instructions: ->
-            | The current record ID is {{!@variables.record_id}}
+            | The current record ID is {{!@variables.currentRecordId}} (object {{!@variables.currentObjectApiName}})
               IMMEDIATELY call the {{!@actions.build}} action. Do NOT ask for more information first.
               - question: pass the user's EXACT message word-for-word.
               - accountName: if the user names a person or organisation, pass it. Never pass "this account", "this HCP" or similar.
-              - accountId: if the user says "this account" or names nobody, pass the record_id value.
+              - accountId: if the user says "this account" or names nobody, pass the current record ID.
               {s['main_instructions']}
               The result is ALWAYS renderable. ALWAYS use show_command to display the returned card.
               NEVER say a card is shown or displayed without actually calling the action first. Call it every time, even for a short or vague request.
@@ -157,7 +164,7 @@ topic {mt}:
             build: @actions.build_card
                 description: "{s['main_action_desc']}"
                 with question = ...
-                with accountId = @variables.record_id
+                with accountId = @variables.currentRecordId
                 with accountName = ...
 
             back_to_router: @utils.transition to @topic.agent_router
@@ -218,15 +225,15 @@ topic account_qa:
 
     reasoning:
         instructions: ->
-            | The current record ID is {{!@variables.record_id}}
-              IMMEDIATELY call the {{!@actions.ask}} action. question = the user's exact message; accountName = any person or organisation named; accountId = the record_id value if no name is given.
+            | The current record ID is {{!@variables.currentRecordId}} (object {{!@variables.currentObjectApiName}})
+              IMMEDIATELY call the {{!@actions.ask}} action. question = the user's exact message; accountName = any person or organisation named; accountId = the current record ID if no name is given.
               Present the output directly, preserving its line breaks. Remove any "=== VISIT LINKS ===" section. Do NOT call the action again.
 
         actions:
             ask: @actions.ask_about_account
                 description: "Get account or HCP intelligence"
                 with question = ...
-                with accountId = @variables.record_id
+                with accountId = @variables.currentRecordId
                 with accountName = ...
 
             back_to_router: @utils.transition to @topic.agent_router

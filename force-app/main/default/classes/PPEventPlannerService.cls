@@ -10,7 +10,7 @@ public with sharing class PPEventPlannerService {
     @TestVisible private static final Integer BLOCK_LEAD_DAYS = 14;
     @TestVisible private static final Integer WARN_LEAD_DAYS = 21;
     @TestVisible private static final Decimal MEAL_CAP_PER_HEAD = 125;
-    @TestVisible private static final Decimal SPEAKER_FEE_CAP = 3000;
+    public static final Decimal SPEAKER_FEE_CAP = 3000;
 
     public static PPEventProposal build(String persona, String templateName, PPCardRequest req) {
         try {
