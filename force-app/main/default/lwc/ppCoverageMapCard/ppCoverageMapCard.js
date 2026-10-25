@@ -1,11 +1,33 @@
-import { LightningElement, api } from 'lwc';
-import { NavigationMixin } from 'lightning/navigation';
+import { LightningElement, api, wire } from 'lwc';
+import { openRecord } from 'c/ppOpenRecord';
+import { NavigationMixin, CurrentPageReference } from 'lightning/navigation';
 import { parseCard, errorText, runAction } from 'c/ppCardUtil';
 
 const W = 340, H = 290, ROW_Y = { executive: 36, 'decision maker': 108, influencer: 184, user: 256 };
 
 export default class PpCoverageMapCard extends NavigationMixin(LightningElement) {
-    @api value;
+    _val;
+    _mob = null;
+
+    get isMobile() { return !this._val && !!this._mob; }
+    @api
+    get value() { return this._val || this._mob; }
+    set value(v) { this._val = v; }
+
+    // The mobile app passes the card fields as c__<field> page-reference state params (lists as JSON strings).
+    @wire(CurrentPageReference)
+    wiredPageRef(pageRef) {
+        const state = pageRef && pageRef.state;
+        if (!state || state.c__channel !== 'Mobile') return;
+        const out = {};
+        Object.keys(state).forEach((k) => {
+            if (k.indexOf('c__') !== 0 || k === 'c__channel') return;
+            let v = state[k];
+            if (typeof v === 'string' && v !== '') { try { v = JSON.parse(v); } catch (e) { /* plain string */ } }
+            out[k.substring(3)] = v;
+        });
+        if (Object.keys(out).length) this._mob = out;
+    }
     selectedIdx;
     done = {};
     message = '';
@@ -104,7 +126,7 @@ export default class PpCoverageMapCard extends NavigationMixin(LightningElement)
     handleOpen(evt) {
         evt.preventDefault();
         const s = this.selected;
-        if (s && s.recordId) this[NavigationMixin.Navigate]({ type: 'standard__recordPage', attributes: { recordId: s.recordId, actionName: 'view' } });
+        if (s && s.recordId) openRecord((id) => this.goRecord(id), s.recordId, this.isMobile);
     }
     handleSelAction() { const s = this.selected; if (s && s.action) this.run(`n${s.idx}`, s.action); }
     handleAction(evt) {
@@ -114,7 +136,7 @@ export default class PpCoverageMapCard extends NavigationMixin(LightningElement)
     }
     async run(key, action) {
         try {
-            this.message = await runAction(action, id => this[NavigationMixin.Navigate]({ type: 'standard__recordPage', attributes: { recordId: id, actionName: 'view' } }));
+            this.message = await runAction(action, id => openRecord((id) => this.goRecord(id), id, this.isMobile));
             this.done = { ...this.done, [key]: true };
         } catch (e) {
             this.message = `Could not complete that action: ${errorText(e)}`;

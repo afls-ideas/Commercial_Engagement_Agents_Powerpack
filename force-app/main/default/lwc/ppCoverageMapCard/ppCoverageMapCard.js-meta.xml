@@ -6,10 +6,15 @@
     <description>Renders the PP Coverage Map custom Lightning type: stakeholder network with relationship-strength rings and coverage gaps.</description>
     <targets>
         <target>lightning__AgentforceOutput</target>
+        <target>lightning__UrlAddressable</target>
     </targets>
     <targetConfigs>
         <targetConfig targets="lightning__AgentforceOutput">
             <sourceType name="c__ppCoverageMap"/>
+            <supportedFormFactors>
+                <supportedFormFactor type="Small"/>
+                <supportedFormFactor type="Large"/>
+            </supportedFormFactors>
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

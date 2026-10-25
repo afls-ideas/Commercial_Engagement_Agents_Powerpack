@@ -6,10 +6,15 @@
     <description>Renders an FSR Account Brief custom Lightning type as a structured summary card in the Agentforce Employee agent.</description>
     <targets>
         <target>lightning__AgentforceOutput</target>
+        <target>lightning__UrlAddressable</target>
     </targets>
     <targetConfigs>
         <targetConfig targets="lightning__AgentforceOutput">
             <sourceType name="c__fsrAccountBrief"/>
+            <supportedFormFactors>
+                <supportedFormFactor type="Small"/>
+                <supportedFormFactor type="Large"/>
+            </supportedFormFactors>
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

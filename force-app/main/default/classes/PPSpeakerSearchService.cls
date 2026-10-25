@@ -4,8 +4,8 @@
  */
 public with sharing class PPSpeakerSearchService {
 
-    @TestVisible private static final Integer ANNUAL_CAP = 4;
-    @TestVisible private static final Integer TRAINING_MONTHS = 12;
+    @TestVisible public static final Integer ANNUAL_CAP = 4;
+    @TestVisible public static final Integer TRAINING_MONTHS = 12;
 
     public class EventCtx {
         public MngEvent ev;
@@ -19,6 +19,8 @@ public with sharing class PPSpeakerSearchService {
     public static PPSpeakerSearch build(String persona, String templateName, PPCardRequest req) {
         try {
             EventCtx ctx = findEvent(req);
+            PPSpeakerSearch have = existingSpeakers(ctx, req);
+            if (have != null) return have;
             List<PPSpeakerCandidate> all = evaluate(ctx, null, req.question);
             if (all.isEmpty()) return message(ctx, 'No approved speakers found', 'There are no Approved, active experts in the speaker pool.');
             List<PPSpeakerCandidate> top = new List<PPSpeakerCandidate>();
@@ -60,6 +62,33 @@ public with sharing class PPSpeakerSearchService {
         }
     }
 
+    private static final List<String> MORE = new List<String>{ 'alternative', 'another', 'other speaker', 'other option', 'instead', 'replace', 'additional', 'second speaker', 'backup', 'back-up', 'more speaker', 'shortlist', 'short list', 'options' };
+
+    /** When the event already has a speaker and the rep did not ask for more or different ones, summarise who is speaking instead of ranking a shortlist. Null otherwise. */
+    private static PPSpeakerSearch existingSpeakers(EventCtx ctx, PPCardRequest req) {
+        if (ctx == null) return null;
+        String q = nz(req.question).toLowerCase();
+        for (String w : MORE) if (q.contains(w)) return null;
+        List<String> lines = PPEventBriefService.speakerSummary(ctx.ev.Id, ctx.ev.StartDateTime);
+        if (lines.isEmpty()) return null;
+        PPSpeakerSearch card = new PPSpeakerSearch();
+        card.title = 'Speaker';
+        card.eventId = ctx.ev.Id;
+        card.eventName = ctx.ev.Name;
+        card.subtitle = ctx.ev.Name + (ctx.ev.StartDateTime == null ? '' : ' - ' + ctx.ev.StartDateTime.format('yyyy-MM-dd')) + ' (' + ctx.source + ')';
+        card.badge = lines.size() == 1 ? '1 speaker' : lines.size() + ' speakers';
+        card.badgeTone = 'positive';
+        card.headline = lines.size() == 1 ? 'This event already has a speaker.' : 'This event already has ' + lines.size() + ' speakers.';
+        card.candidates = new List<PPSpeakerCandidate>();
+        card.sections = new List<PPSection>();
+        PPSection sec = new PPSection();
+        sec.heading = lines.size() == 1 ? 'Speaker on this event' : 'Speakers on this event';
+        sec.bullets = lines;
+        card.sections.add(sec);
+        card.nextStep = 'Ask for alternative speakers if you want a shortlist, or ask about the attendees.';
+        return card;
+    }
+
     /** Event to work on: the MngEvent record page the rep is on, else an event named in the request, else their newest draft. Null when none. */
     public static EventCtx findEvent(PPCardRequest req) {
         MngEvent ev = null;
@@ -95,7 +124,7 @@ public with sharing class PPSpeakerSearchService {
 
     /** The visible event whose name shares the most words with the text, newest first on a tie. Null when no word matches. */
     @TestVisible
-    private static Id bestNameMatch(String text) {
+    public static Id bestNameMatch(String text) {
         Set<String> words = new Set<String>();
         for (String w : text.toLowerCase().replaceAll('[^a-z0-9 ]', ' ').split(' ')) if (w.length() >= 3 && !STOP.contains(w)) words.add(w);
         Id best = null;
@@ -110,7 +139,7 @@ public with sharing class PPSpeakerSearchService {
     }
 
     /** Names of the rep's open events, so the card can offer them when no event could be resolved. */
-    private static String openEvents() {
+    public static String openEvents() {
         List<String> n = new List<String>();
         for (MngEvent e : [SELECT Name, Status, StartDateTime FROM MngEvent WHERE CreatedById = :UserInfo.getUserId() AND Status != 'Cancelled'
                            ORDER BY CreatedDate DESC LIMIT 8]) n.add(e.Name + ' (' + e.Status + ')');
@@ -180,6 +209,7 @@ public with sharing class PPSpeakerSearchService {
                 if (relevant && current) { qualified = true; sub = s.Subject.Name; }
             }
             if (qualified) { score += 40; c.checks.add(new PPEventCheck('Qualified', 'pass', 'Qualified to speak on ' + sub + '.')); }
+            else if (ctx == null || ctx.products.isEmpty()) { score += 10; c.checks.add(new PPEventCheck('Qualified', 'warn', 'The event has no product, so qualification cannot be verified. Add the product to the event first.')); }
             else c.checks.add(new PPEventCheck('Qualified', 'block', 'Not qualified on the product for this event.'));
 
             // Location
@@ -251,7 +281,7 @@ public with sharing class PPSpeakerSearchService {
 
     /** "KEY: value | KEY: value" -> map. */
     @TestVisible
-    private static Map<String, String> parse(String s) {
+    public static Map<String, String> parse(String s) {
         Map<String, String> m = new Map<String, String>();
         if (s == null) return m;
         for (String part : s.split('\\|')) {

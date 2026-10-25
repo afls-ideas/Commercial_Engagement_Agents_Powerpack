@@ -6,6 +6,7 @@
     <description>Renders the PP Speaker Search custom Lightning type: ranked speakers with compliance checks and an add-as-speaker button.</description>
     <targets>
         <target>lightning__AgentforceOutput</target>
+        <target>lightning__UrlAddressable</target>
     </targets>
     <targetConfigs>
         <targetConfig targets="lightning__AgentforceOutput">

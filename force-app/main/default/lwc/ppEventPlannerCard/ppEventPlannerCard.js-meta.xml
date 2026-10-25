@@ -6,6 +6,7 @@
     <description>Renders the PP Event Planner custom Lightning type: event proposal with cost, compliance preflight and a confirm-to-create button.</description>
     <targets>
         <target>lightning__AgentforceOutput</target>
+        <target>lightning__UrlAddressable</target>
     </targets>
     <targetConfigs>
         <targetConfig targets="lightning__AgentforceOutput">

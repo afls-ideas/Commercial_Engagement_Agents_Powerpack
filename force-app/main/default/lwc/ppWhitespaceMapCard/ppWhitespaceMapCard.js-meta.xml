@@ -6,10 +6,15 @@
     <description>Renders the PP Whitespace Map custom Lightning type: bubble matrix of potential versus share sized by revenue with Grow/Defend/Develop/Maintain quadrants.</description>
     <targets>
         <target>lightning__AgentforceOutput</target>
+        <target>lightning__UrlAddressable</target>
     </targets>
     <targetConfigs>
         <targetConfig targets="lightning__AgentforceOutput">
             <sourceType name="c__ppWhitespaceMap"/>
+            <supportedFormFactors>
+                <supportedFormFactor type="Small"/>
+                <supportedFormFactor type="Large"/>
+            </supportedFormFactors>
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

@@ -1,11 +1,33 @@
-import { LightningElement, api } from 'lwc';
-import { NavigationMixin } from 'lightning/navigation';
+import { LightningElement, api, wire } from 'lwc';
+import { openRecord } from 'c/ppOpenRecord';
+import { NavigationMixin, CurrentPageReference } from 'lightning/navigation';
 import { parseCard, errorText } from 'c/ppCardUtil';
 import addSpeaker from '@salesforce/apex/PPSpeakerController.addSpeaker';
 import removeSpeaker from '@salesforce/apex/PPSpeakerController.removeSpeaker';
 
 export default class PpSpeakerSearchCard extends NavigationMixin(LightningElement) {
-    @api value;
+    _val;
+    _mob = null;
+
+    get isMobile() { return !this._val && !!this._mob; }
+    @api
+    get value() { return this._val || this._mob; }
+    set value(v) { this._val = v; }
+
+    // The mobile app passes the card fields as c__<field> page-reference state params (lists as JSON strings).
+    @wire(CurrentPageReference)
+    wiredPageRef(pageRef) {
+        const state = pageRef && pageRef.state;
+        if (!state || state.c__channel !== 'Mobile') return;
+        const out = {};
+        Object.keys(state).forEach((k) => {
+            if (k.indexOf('c__') !== 0 || k === 'c__channel') return;
+            let v = state[k];
+            if (typeof v === 'string' && v !== '') { try { v = JSON.parse(v); } catch (e) { /* plain string */ } }
+            out[k.substring(3)] = v;
+        });
+        if (Object.keys(out).length) this._mob = out;
+    }
     busyId = null;
     addedByExpert = {};
     removed = {};
@@ -62,7 +84,11 @@ export default class PpSpeakerSearchCard extends NavigationMixin(LightningElemen
         this.busyId = null;
     }
     handleOpen() {
-        this[NavigationMixin.Navigate]({ type: 'standard__recordPage', attributes: { recordId: this.card.eventId, actionName: 'view' } });
+        openRecord((id) => this.goRecord(id), this.card.eventId, this.isMobile);
+    }
+    handleOpenRecord(evt) {
+        evt.preventDefault();
+        openRecord((id) => this.goRecord(id), evt.currentTarget.dataset.id, this.isMobile);
     }
     get canOpen() { return !!(this.card && this.card.eventId); }
 }

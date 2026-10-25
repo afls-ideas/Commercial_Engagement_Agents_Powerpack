@@ -189,6 +189,6 @@ Commercial account-planning agents (each with its own visualization):
 - [Cross-functional QBR huddle](docs/scenarios/qbr-account-huddle.md): timeline, scorecard vs plan, decisions, actions by function
 
 ### Managed Events agents (read and write)
-- [Event Planner](docs/scenarios/event-planner.md): suggests an event, runs a compliance preflight, creates the Draft event after the rep confirms, and recommends speakers for an existing event (record-page aware)
+- [Event Planner](docs/scenarios/event-planner.md): suggests an event, runs a compliance preflight, creates the Draft event after the rep confirms, recommends speakers for an existing event, and answers questions about an event or a person (speakers, attendees, who showed up at earlier events, other events invited to), record-page aware
 
 Screenshots show org and user details; review before publishing.

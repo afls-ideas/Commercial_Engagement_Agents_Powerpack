@@ -6,10 +6,15 @@
     <description>Renders the PP Account Plan custom Lightning type: plan-health gauge, goal tree of objectives with KPI progress, and SWOT.</description>
     <targets>
         <target>lightning__AgentforceOutput</target>
+        <target>lightning__UrlAddressable</target>
     </targets>
     <targetConfigs>
         <targetConfig targets="lightning__AgentforceOutput">
             <sourceType name="c__ppAccountPlan"/>
+            <supportedFormFactors>
+                <supportedFormFactor type="Small"/>
+                <supportedFormFactor type="Large"/>
+            </supportedFormFactors>
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

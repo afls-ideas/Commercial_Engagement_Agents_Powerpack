@@ -1,12 +1,34 @@
-import { LightningElement, api } from 'lwc';
-import { NavigationMixin } from 'lightning/navigation';
+import { LightningElement, api, wire } from 'lwc';
+import { openRecord } from 'c/ppOpenRecord';
+import { NavigationMixin, CurrentPageReference } from 'lightning/navigation';
 import createTask from '@salesforce/apex/PPCardActionController.createTask';
 
 const W = 340, H = 250, PL = 34, PR = 12, PT = 12, PB = 30;
 const STANCE_CLASS = { champion: 'champion', supporter: 'supporter', neutral: 'neutral', skeptic: 'skeptic', blocker: 'blocker' };
 
 export default class PpCommitteeMapCard extends NavigationMixin(LightningElement) {
-    @api value;
+    _val;
+    _mob = null;
+
+    get isMobile() { return !this._val && !!this._mob; }
+    @api
+    get value() { return this._val || this._mob; }
+    set value(v) { this._val = v; }
+
+    // The mobile app passes the card fields as c__<field> page-reference state params (lists as JSON strings).
+    @wire(CurrentPageReference)
+    wiredPageRef(pageRef) {
+        const state = pageRef && pageRef.state;
+        if (!state || state.c__channel !== 'Mobile') return;
+        const out = {};
+        Object.keys(state).forEach((k) => {
+            if (k.indexOf('c__') !== 0 || k === 'c__channel') return;
+            let v = state[k];
+            if (typeof v === 'string' && v !== '') { try { v = JSON.parse(v); } catch (e) { /* plain string */ } }
+            out[k.substring(3)] = v;
+        });
+        if (Object.keys(out).length) this._mob = out;
+    }
     selectedIdx;
     done = {};
     message = '';
@@ -107,7 +129,7 @@ export default class PpCommitteeMapCard extends NavigationMixin(LightningElement
     handleOpenMember(evt) {
         evt.preventDefault(); evt.stopPropagation();
         const s = this.selected;
-        if (s && s.recordId) this[NavigationMixin.Navigate]({ type: 'standard__recordPage', attributes: { recordId: s.recordId, actionName: 'view' } });
+        if (s && s.recordId) openRecord((id) => this.goRecord(id), s.recordId, this.isMobile);
     }
     handleKey(evt) {
         if (evt.key === 'Enter' || evt.key === ' ') { evt.preventDefault(); this.handleSelect(evt); }
@@ -129,7 +151,7 @@ export default class PpCommitteeMapCard extends NavigationMixin(LightningElement
                 await navigator.clipboard.writeText(action.text || '');
                 this.finish(key, 'Copied to clipboard.');
             } else if (action.kind === 'open') {
-                this[NavigationMixin.Navigate]({ type: 'standard__recordPage', attributes: { recordId: action.recordId, actionName: 'view' } });
+                openRecord((id) => this.goRecord(id), action.recordId, this.isMobile);
                 this.finish(key, '');
             } else {
                 const escalate = action.kind === 'escalate';

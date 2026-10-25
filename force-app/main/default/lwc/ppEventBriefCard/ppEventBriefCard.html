@@ -1,0 +1,85 @@
+<template>
+    <template lwc:if={hasCard}>
+        <article class="pp-card">
+            <header class="pp-header">
+                <div class="pp-avatar"><lightning-icon icon-name="standard:event" size="small" variant="inverse"></lightning-icon></div>
+                <div class="pp-heading">
+                    <h2 class="pp-title">{card.title}</h2>
+                    <template lwc:if={card.subtitle}><p class="pp-sub">{card.subtitle}</p></template>
+                </div>
+                <template lwc:if={card.badge}><span class={badgeClass}>{card.badge}</span></template>
+            </header>
+            <template lwc:if={card.headline}><p class="pp-headline">{card.headline}</p></template>
+            <template lwc:if={hasMetrics}>
+                <div class="pp-metrics">
+                    <template for:each={metrics} for:item="m">
+                        <div key={m.key} class={m.cls}><span class="pp-metric-label">{m.label}</span><span class="pp-metric-value">{m.value}</span></div>
+                    </template>
+                </div>
+            </template>
+            <template for:each={sections} for:item="s">
+                <section key={s.key} class="pp-block">
+                    <h3 class="pp-block-heading">{s.heading}</h3>
+                    <ul class="pp-bullets"><template for:each={s.bullets} for:item="b"><li key={b.key}>{b.text}</li></template></ul>
+                </section>
+            </template>
+            <template for:each={blocks} for:item="blk">
+                <section key={blk.key} class="pp-block">
+                    <h3 class="pp-block-heading">{blk.title}</h3>
+                    <template lwc:if={blk.isFacts}>
+                        <dl class="ev-facts">
+                            <template for:each={blk.rows} for:item="r">
+                                <div key={r.key} class="ev-fact"><dt>{r.label}</dt><dd class={r.cls}>{r.value}</dd></div>
+                            </template>
+                        </dl>
+                    </template>
+                    <template lwc:if={blk.isPeople}>
+                        <ul class="ev-people">
+                            <template for:each={blk.people} for:item="p">
+                                <li key={p.key} class="ev-person">
+                                    <div class="ev-top">
+                                        <div class="ev-who">
+                                            <template lwc:if={p.accountId}><a href="#" class="ev-name ev-anchor" data-id={p.accountId} onclick={handleOpenRecord}>{p.name}</a></template><template lwc:else><span class="ev-name">{p.name}</span></template>
+                                            <template lwc:if={p.meta}><span class="ev-meta">{p.meta}</span></template>
+                                        </div>
+                                        <div class="ev-chips">
+                                            <template for:each={p.chips} for:item="c"><span key={c.key} class={c.cls}>{c.text}</span></template>
+                                        </div>
+                                    </div>
+                                    <template lwc:if={p.flag}><p class={p.flagCls}>{p.flag}</p></template>
+                                    <template lwc:if={p.hasNotes}>
+                                        <ul class="pp-bullets"><template for:each={p.notes} for:item="n"><li key={n.key}>{n.text}</li></template></ul>
+                                    </template>
+                                    <template lwc:if={p.hasHistory}>
+                                        <button class="ev-link" data-key={p.key} data-open={p.open} onclick={handleToggle}>{p.toggleLabel}</button>
+                                        <template lwc:if={p.open}>
+                                            <ul class="ev-past">
+                                                <template for:each={p.past} for:item="h">
+                                                    <li key={h.key} class="ev-past-row">
+                                                        <div><template lwc:if={h.eventId}><a href="#" class="ev-past-name ev-anchor" data-id={h.eventId} onclick={handleOpenRecord}>{h.name}</a></template><template lwc:else><span class="ev-past-name">{h.name}</span></template><span class="ev-meta">{h.line}</span></div>
+                                                        <span class={h.outCls}>{h.outcome}</span>
+                                                    </li>
+                                                </template>
+                                            </ul>
+                                        </template>
+                                    </template>
+                                </li>
+                            </template>
+                        </ul>
+                        <template lwc:if={blk.more}><p class="pp-message">{blk.more}</p></template>
+                    </template>
+                </section>
+            </template>
+            <template lwc:if={card.nextStep}>
+                <div class="pp-next">
+                    <lightning-icon icon-name="utility:target" size="xx-small"></lightning-icon>
+                    <div><span class="pp-next-label">Next step</span><span class="pp-next-value">{card.nextStep}</span></div>
+                </div>
+            </template>
+            <template lwc:if={canOpen}>
+                <div class="pp-actions"><button class="pp-btn" onclick={handleOpen}>Open event</button></div>
+            </template>
+        </article>
+    </template>
+    <template lwc:else><div class="pp-empty">Nothing to show yet.</div></template>
+</template>

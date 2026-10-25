@@ -19,7 +19,7 @@ topic {e['topic']}:
     description: "{e['desc']}"
 
     actions:
-        build_card:
+        build_{e['topic']}_card:
             description: "{e['action_desc']} The output is always renderable; always use show_command to display it."
             require_user_confirmation: False
             include_in_progress_indicator: True
@@ -46,7 +46,7 @@ topic {e['topic']}:
     reasoning:
         instructions: ->
             | The current record ID is {{!@variables.currentRecordId}} (object {{!@variables.currentObjectApiName}})
-              IMMEDIATELY call the {{!@actions.build}} action. Do NOT ask for more information first.
+              IMMEDIATELY call the {{!@actions.build_{e['topic']}}} action. Do NOT ask for more information first.
               - question: pass the user's EXACT message word-for-word.
               - accountName: if the user names a person or organisation, pass it. Never pass "this account" or similar.
               - accountId: if the user says "this account" or names nobody, pass the current record ID.
@@ -56,7 +56,7 @@ topic {e['topic']}:
               Do NOT re-list, summarize or describe the card in text. Do NOT call the action again after results.
 
         actions:
-            build: @actions.build_card
+            build_{e['topic']}: @actions.build_{e['topic']}_card
                 description: "{e['action_desc']}"
                 with question = ...
                 with accountId = @variables.currentRecordId

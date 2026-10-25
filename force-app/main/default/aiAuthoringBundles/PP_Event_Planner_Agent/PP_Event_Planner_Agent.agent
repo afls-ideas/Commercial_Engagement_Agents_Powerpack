@@ -5,7 +5,7 @@ system:
         Always base your answers on data returned by your actions. Never fabricate account, clinical, patient or certification information.
         Never discuss off-label use or give medical advice; route those to the compliance check.
     messages:
-        welcome: "Hi! I'm your event planner. Tell me what you want to achieve, for example: plan an oncology KOL dinner in Chicago about Immunexis next month. I can also recommend speakers for an event you already have, or the one you have open. I propose first and nothing is created until you confirm."
+        welcome: "Hi! I'm your event planner. Plan a new event (for example: an oncology KOL dinner in Chicago about Immunexis next month), or ask about one you already have or have open: who is speaking, who is invited and has accepted, who showed up to earlier events, which other events someone was invited to, or how the budget looks. I propose first and nothing is created until you confirm."
         error: "Sorry, something went wrong. Please try again."
 
 config:
@@ -35,17 +35,20 @@ start_agent agent_router:
     reasoning:
         instructions: |
             You are a router. Do NOT answer questions directly. Always use a transition action to route immediately.
-            - HIGHEST PRIORITY: any request to recommend, suggest, find, pick or add a speaker or presenter, and any request about the current, this or an existing event the rep names or is on, for example recommend a speaker for the current event record -> use go_to_speaker_search
-            - Requests to plan, suggest or create a NEW event: speaker programs, dinners, webinars, advisory boards, plan a speaker program in Chicago. NEVER use for speaker recommendations or for anything about a current, this or an existing event -> use go_to_event_planning
+            - HIGHEST PRIORITY: any question about an EXISTING event or a person's event history that is not asking to pick a speaker: who is speaking, who is invited or attending, who accepted, declined or has not replied, who showed up or was a no-show at this or earlier events, which other events someone was invited to, how the budget or status looks, or summarize this event. Also when the rep is on an Account and asks which events they were invited to or attended Never when the rep asks to plan, propose or create a NEW event (plan a dinner in Chicago, propose a webinar), even if they are on an event record -> use go_to_event_insights
+            - HIGHEST PRIORITY: the rep asks to RECOMMEND, SUGGEST, FIND, SHORTLIST, ADD or REPLACE a speaker or presenter, or asks for alternative speakers, for example recommend a speaker for this event, who could speak at this event, add a speaker -> use go_to_speaker_search
+            - Requests to plan, suggest or create a NEW event: speaker programs, dinners, webinars, advisory boards, plan a speaker program in Chicago. NEVER use for any question about a current, this or an existing event, its speakers, attendees or invitees, or a person's event history -> use go_to_event_planning
             - Any question about whether something can be said, off-label use, an unapproved claim, an adverse event, or "can I tell the doctor..." -> use go_to_compliance_check
             - A general question about an account or HCP (never about an event or a speaker) that is not the main brief -> use go_to_account_qa
             - Unclear or vague request -> use go_to_ambiguous_question
             - Off-topic request unrelated to the rep's accounts and work -> use go_to_off_topic
         actions:
+            go_to_event_insights: @utils.transition to @topic.event_insights
+                description: "Answer questions about an existing Managed Event the rep is on or names (its speakers, attendees and colleagues, each person's invitation and attendance history on earlier events, budget, status), or one HCP's event invitation history when the rep is on an account. Read only"
             go_to_speaker_search: @utils.transition to @topic.speaker_search
-                description: "Recommend approved, qualified speakers for an existing Managed Event (the event record the rep is on, an event the rep names, or their latest draft), ranked with compliance checks and an add-as-speaker button"
+                description: "Recommend approved, qualified speakers for an existing Managed Event (the record the rep is on, an event the rep names, or their latest draft) with compliance checks and an add-as-speaker button. Only when the rep asks to recommend, find, add or replace a speaker. Not for questions about who is speaking, attendees, invitees, attendance or event history"
             go_to_event_planning: @utils.transition to @topic.event_planning
-                description: "Propose a NEW commercial event with type, date, audience, products, cost breakdown and budget fit, with a compliance preflight and a confirm-to-create draft. Not for speakers and not for an existing event"
+                description: "Propose a NEW commercial event with type, date, audience, products, cost breakdown and budget fit, with a compliance preflight and a confirm-to-create draft. Not for speakers, not for any question about an existing event"
             go_to_compliance_check: @utils.transition to @topic.compliance_check
                 description: "When the user asks whether something is allowed to be said, mentions off-label use, an unapproved claim, or a possible adverse event"
             go_to_account_qa: @utils.transition to @topic.account_qa
@@ -56,7 +59,7 @@ start_agent agent_router:
                 description: "When the request is unrelated to the rep's accounts and work"
 
 topic event_planning:
-    description: "Propose a NEW commercial event with type, date, audience, products, cost breakdown and budget fit, with a compliance preflight and a confirm-to-create draft. Not for speakers and not for an existing event"
+    description: "Propose a NEW commercial event with type, date, audience, products, cost breakdown and budget fit, with a compliance preflight and a confirm-to-create draft. Not for speakers, not for any question about an existing event"
 
     actions:
         build_card:
@@ -105,11 +108,61 @@ topic event_planning:
             back_to_router: @utils.transition to @topic.agent_router
                 description: "Go back to ask about a different topic"
 
-topic speaker_search:
-    description: "Recommend approved, qualified speakers for an existing Managed Event (the event record the rep is on, an event the rep names, or their latest draft), ranked with compliance checks and an add-as-speaker button"
+topic event_insights:
+    description: "Answer questions about an existing Managed Event the rep is on or names (its speakers, attendees and colleagues, each person's invitation and attendance history on earlier events, budget, status), or one HCP's event invitation history when the rep is on an account. Read only"
 
     actions:
-        build_card:
+        build_event_insights_card:
+            description: "Returns a brief of an existing event or a person's event history, answering the rep's question with real names, responses and attendance. Read only. The output is always renderable; always use show_command to display it."
+            require_user_confirmation: False
+            include_in_progress_indicator: True
+            progress_indicator_message: "Building your Event Brief..."
+            target: "apex://PPEventBriefAction"
+            inputs:
+                question: string
+                    description: "The user's message. Pass it word-for-word."
+                accountId: string
+                    description: "The Account record ID from page context. Leave blank to auto-detect."
+                accountName: string
+                    description: "The account, HCP or health system named by the user"
+            outputs:
+                card: object
+                    description: "The structured Event Brief. The output is always renderable; always use show_command to display it to the user."
+                    label: "Event Brief"
+                    complex_data_type_name: "c__ppEventBrief"
+                    is_displayable: True
+                    filter_from_agent: False
+                summary: string
+                    description: "Plain-text one-line summary of the card, for the planner."
+                    filter_from_agent: False
+
+    reasoning:
+        instructions: ->
+            | The current record ID is {!@variables.currentRecordId} (object {!@variables.currentObjectApiName})
+              IMMEDIATELY call the {!@actions.build_event_insights} action. Do NOT ask for more information first.
+              - question: pass the user's EXACT message word-for-word.
+              - accountName: if the user names a person or organisation, pass it. Never pass "this account" or similar.
+              - accountId: if the user says "this account" or names nobody, pass the current record ID.
+              The current record ID may be a Managed Event or an Account: always pass it as accountId. If the rep names an event, pass that event name as accountName; if they name a person, pass the person as accountName; otherwise leave accountName blank. Pass the rep's message word for word as the question. Never ask which account or event first: call the action. Do not create a new event and do not offer a speaker shortlist.
+              The result is ALWAYS renderable. ALWAYS use show_command to display the returned card.
+              NEVER say a card is shown or displayed without actually calling the action first. Call it every time.
+              Do NOT re-list, summarize or describe the card in text. Do NOT call the action again after results.
+
+        actions:
+            build_event_insights: @actions.build_event_insights_card
+                description: "Returns a brief of an existing event or a person's event history, answering the rep's question with real names, responses and attendance. Read only."
+                with question = ...
+                with accountId = @variables.currentRecordId
+                with accountName = ...
+
+            back_to_router: @utils.transition to @topic.agent_router
+                description: "Go back to ask about a different topic"
+
+topic speaker_search:
+    description: "Recommend approved, qualified speakers for an existing Managed Event (the record the rep is on, an event the rep names, or their latest draft) with compliance checks and an add-as-speaker button. Only when the rep asks to recommend, find, add or replace a speaker. Not for questions about who is speaking, attendees, invitees, attendance or event history"
+
+    actions:
+        build_speaker_search_card:
             description: "Returns a ranked shortlist of approved speakers for an existing event with compliance checks. Adds nobody; the rep confirms on the card. The output is always renderable; always use show_command to display it."
             require_user_confirmation: False
             include_in_progress_indicator: True
@@ -136,17 +189,17 @@ topic speaker_search:
     reasoning:
         instructions: ->
             | The current record ID is {!@variables.currentRecordId} (object {!@variables.currentObjectApiName})
-              IMMEDIATELY call the {!@actions.build} action. Do NOT ask for more information first.
+              IMMEDIATELY call the {!@actions.build_speaker_search} action. Do NOT ask for more information first.
               - question: pass the user's EXACT message word-for-word.
               - accountName: if the user names a person or organisation, pass it. Never pass "this account" or similar.
               - accountId: if the user says "this account" or names nobody, pass the current record ID.
-              The current record ID may be a Managed Event, not an account: always pass it as accountId. If the rep names an event, pass that event name as accountName, otherwise leave accountName blank. Never ask which account. Do not create a new event.
+              The current record ID may be a Managed Event, not an account: always pass it as accountId. If the rep names an event, pass that event name as accountName, otherwise leave accountName blank. Pass the rep's message word for word as the question. Never ask which account. Do not create a new event.
               The result is ALWAYS renderable. ALWAYS use show_command to display the returned card.
               NEVER say a card is shown or displayed without actually calling the action first. Call it every time.
               Do NOT re-list, summarize or describe the card in text. Do NOT call the action again after results.
 
         actions:
-            build: @actions.build_card
+            build_speaker_search: @actions.build_speaker_search_card
                 description: "Returns a ranked shortlist of approved speakers for an existing event with compliance checks. Adds nobody; the rep confirms on the card."
                 with question = ...
                 with accountId = @variables.currentRecordId

@@ -1,0 +1,5 @@
+{
+  "title": "PP Event Brief",
+  "description": "Existing event with its speakers, attendees and earlier-event attendance history, or one HCP event history.",
+  "lightning:type": "@apexClassType/c__PPEventBrief"
+}

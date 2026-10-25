@@ -42,13 +42,22 @@ Approved and active expert, qualified on the event's product (`ExpertSubject` cu
 - **Add as speaker** inserts a `MngEventParticipant` with the event type's expert role, as the rep, and re-checks everything on the server. If the rep can see the event but cannot edit it, the card says *View only* and offers no button.
 - Test data: `tools/seed/seed_experts.apex` creates 9 speakers (one not qualified, one only nominated, one rejected).
 
+## Event Brief: ask about an existing event or a person (read only)
+Topic `event_insights`, action `PPEventBriefAction`, prompt template `PP_Event_Brief`, card `ppEventBriefCard`.
+- On an event record, or naming an event: who is speaking, who is invited, accepted, declined or has not replied, who attended, budget and status, "summarize this event". Each speaker, attendee and colleague shows their earlier events (invited, replied, attended or no-show), repeat invitees, and a flag for anyone who missed an earlier event.
+- On an Account: "which events has this HCP been invited to and did they show up".
+- If the event already has a speaker, "who is speaking" summarises that speaker (programs this year, earlier events). "Recommend a speaker" on an event that already has one also summarises the speaker and offers a shortlist only when the rep asks for alternatives.
+- Counts, flags and the person lists are computed in Apex; the model only writes the headline, insights and next step. Only an outcome of *No show* counts as missing an event; *Accepted* is a reply, not attendance.
+- Routing: the router sends recommend, find, add and replace speaker requests to Speaker Search, new-event requests to the planner, and everything else about an existing event to the Event Brief.
+- Gotcha: every topic's action must have a unique name (`build_event_insights_card`, `build_speaker_search_card`). When several topics all used `build_card`, the Event Brief data rendered in the Speaker Search card.
+
 ## How the write is kept safe
 - `PPEventDraftController` is `with sharing` and inserts in user mode, so the rep's object and field access apply. Fields the rep cannot set (for example `Mode`) are skipped and reported on the card.
 - The proposal is re-validated on the server at create time. Ids are resolved from names there, so a blocked proposal cannot be created by editing the client.
 - All inserts are in one transaction (rolled back on any error). Undo sets the status to Cancelled instead of deleting.
 
 ## What to customize
-Prompt templates `PP_Event_Planner` and `PP_Speaker_Search`, facts `EV_*` (event rules and type guide), LWCs `ppEventPlannerCard` and `ppSpeakerSearchCard`, thresholds and the commercial type list in `PPEventPlannerService` and `PPSpeakerSearchService`.
+Prompt templates `PP_Event_Planner`, `PP_Speaker_Search` and `PP_Event_Brief`, facts `EV_*` (event rules and type guide), LWCs `ppEventPlannerCard`, `ppSpeakerSearchCard` and `ppEventBriefCard`, thresholds and the commercial type list in `PPEventPlannerService` and `PPSpeakerSearchService`.
 
 ## Notes
 - Next in this family: Invitee Finder (adds `MngEventParticipant`), Compliance Check and Closeout.

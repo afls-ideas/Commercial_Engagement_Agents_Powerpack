@@ -1,12 +1,35 @@
-import { LightningElement, api } from 'lwc';
-import { NavigationMixin } from 'lightning/navigation';
+import { LightningElement, api, wire } from 'lwc';
+import { openRecord } from 'c/ppOpenRecord';
+import { NavigationMixin, CurrentPageReference } from 'lightning/navigation';
 import { parseCard, errorText } from 'c/ppCardUtil';
 import checkProposal from '@salesforce/apex/PPEventDraftController.check';
 import createDraft from '@salesforce/apex/PPEventDraftController.createDraft';
 import cancelDraft from '@salesforce/apex/PPEventDraftController.cancelDraft';
 
 export default class PpEventPlannerCard extends NavigationMixin(LightningElement) {
-    @api value;
+    _val;
+    _mob = null;
+
+    goRecord(id) { this[NavigationMixin.Navigate]({ type: 'standard__recordPage', attributes: { recordId: id, actionName: 'view' } }); }
+    get isMobile() { return !this._val && !!this._mob; }
+    @api
+    get value() { return this._val || this._mob; }
+    set value(v) { this._val = v; }
+
+    // The mobile app passes the card fields as c__<field> page-reference state params (lists as JSON strings).
+    @wire(CurrentPageReference)
+    wiredPageRef(pageRef) {
+        const state = pageRef && pageRef.state;
+        if (!state || state.c__channel !== 'Mobile') return;
+        const out = {};
+        Object.keys(state).forEach((k) => {
+            if (k.indexOf('c__') !== 0 || k === 'c__channel') return;
+            let v = state[k];
+            if (typeof v === 'string' && v !== '') { try { v = JSON.parse(v); } catch (e) { /* plain string */ } }
+            out[k.substring(3)] = v;
+        });
+        if (Object.keys(out).length) this._mob = out;
+    }
     edited = null;
     busy = false;
     created = null;
@@ -84,7 +107,7 @@ export default class PpEventPlannerCard extends NavigationMixin(LightningElement
         this.busy = false;
     }
     handleOpen() {
-        this[NavigationMixin.Navigate]({ type: 'standard__recordPage', attributes: { recordId: this.created.eventId, actionName: 'view' } });
+        openRecord((id) => this.goRecord(id), this.created.eventId, this.isMobile);
     }
     async handleUndo() {
         this.busy = true;

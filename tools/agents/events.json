@@ -4,10 +4,10 @@
  "description": "Employee agent for reps: proposes a compliant commercial event (type, date, audience, products, cost breakdown, budget) with a compliance preflight, then creates the Draft event in Managed Events after the rep confirms",
  "persona": "events",
  "system": "You are an event strategist for a pharma or medtech sales rep. You propose one well-sized commercial event, check it against compliance rules, and only after the rep confirms on the card is a Draft event created. You never create or send for approval by yourself and you never propose medical or grant events.",
- "welcome": "Hi! I'm your event planner. Tell me what you want to achieve, for example: plan an oncology KOL dinner in Chicago about Immunexis next month. I can also recommend speakers for an event you already have, or the one you have open. I propose first and nothing is created until you confirm.",
+ "welcome": "Hi! I'm your event planner. Plan a new event (for example: an oncology KOL dinner in Chicago about Immunexis next month), or ask about one you already have or have open: who is speaking, who is invited and has accepted, who showed up to earlier events, which other events someone was invited to, or how the budget looks. I propose first and nothing is created until you confirm.",
  "main_topic": "event_planning",
- "main_topic_desc": "Propose a NEW commercial event with type, date, audience, products, cost breakdown and budget fit, with a compliance preflight and a confirm-to-create draft. Not for speakers and not for an existing event",
- "router_main": "Requests to plan, suggest or create a NEW event: speaker programs, dinners, webinars, advisory boards, plan a speaker program in Chicago. NEVER use for speaker recommendations or for anything about a current, this or an existing event",
+ "main_topic_desc": "Propose a NEW commercial event with type, date, audience, products, cost breakdown and budget fit, with a compliance preflight and a confirm-to-create draft. Not for speakers, not for any question about an existing event",
+ "router_main": "Requests to plan, suggest or create a NEW event: speaker programs, dinners, webinars, advisory boards, plan a speaker program in Chicago. NEVER use for any question about a current, this or an existing event, its speakers, attendees or invitees, or a person's event history",
  "main_action_class": "PPEventPlannerAction",
  "main_action_desc": "Returns an event proposal with cost breakdown, budget fit and compliance checks. Creates nothing; the rep confirms on the card.",
  "main_support_classes": [
@@ -32,15 +32,32 @@
  "scope": "suggesting and drafting commercial events: speaker programs, webinars, advisory boards",
  "extra_topics": [
   {
+   "topic": "event_insights",
+   "router": "HIGHEST PRIORITY: any question about an EXISTING event or a person's event history that is not asking to pick a speaker: who is speaking, who is invited or attending, who accepted, declined or has not replied, who showed up or was a no-show at this or earlier events, which other events someone was invited to, how the budget or status looks, or summarize this event. Also when the rep is on an Account and asks which events they were invited to or attended Never when the rep asks to plan, propose or create a NEW event (plan a dinner in Chicago, propose a webinar), even if they are on an event record",
+   "desc": "Answer questions about an existing Managed Event the rep is on or names (its speakers, attendees and colleagues, each person's invitation and attendance history on earlier events, budget, status), or one HCP's event invitation history when the rep is on an account. Read only",
+   "action_desc": "Returns a brief of an existing event or a person's event history, answering the rep's question with real names, responses and attendance. Read only.",
+   "class": "PPEventBriefAction",
+   "clt": "ppEventBrief",
+   "card_label": "Event Brief",
+   "support_classes": [
+    "PPEventBrief",
+    "PPEventBriefResult",
+    "PPEventBriefService",
+    "PPEventPerson",
+    "PPEventPast"
+   ],
+   "instructions": "The current record ID may be a Managed Event or an Account: always pass it as accountId. If the rep names an event, pass that event name as accountName; if they name a person, pass the person as accountName; otherwise leave accountName blank. Pass the rep's message word for word as the question. Never ask which account or event first: call the action. Do not create a new event and do not offer a speaker shortlist."
+  },
+  {
    "topic": "speaker_search",
-   "router": "HIGHEST PRIORITY: any request to recommend, suggest, find, pick or add a speaker or presenter, and any request about the current, this or an existing event the rep names or is on, for example recommend a speaker for the current event record",
-   "desc": "Recommend approved, qualified speakers for an existing Managed Event (the event record the rep is on, an event the rep names, or their latest draft), ranked with compliance checks and an add-as-speaker button",
+   "router": "HIGHEST PRIORITY: the rep asks to RECOMMEND, SUGGEST, FIND, SHORTLIST, ADD or REPLACE a speaker or presenter, or asks for alternative speakers, for example recommend a speaker for this event, who could speak at this event, add a speaker",
+   "desc": "Recommend approved, qualified speakers for an existing Managed Event (the record the rep is on, an event the rep names, or their latest draft) with compliance checks and an add-as-speaker button. Only when the rep asks to recommend, find, add or replace a speaker. Not for questions about who is speaking, attendees, invitees, attendance or event history",
    "action_desc": "Returns a ranked shortlist of approved speakers for an existing event with compliance checks. Adds nobody; the rep confirms on the card.",
    "class": "PPSpeakerSearchAction",
    "clt": "ppSpeakerSearch",
    "card_label": "Speaker Shortlist",
    "support_classes": [],
-   "instructions": "The current record ID may be a Managed Event, not an account: always pass it as accountId. If the rep names an event, pass that event name as accountName, otherwise leave accountName blank. Never ask which account. Do not create a new event."
+   "instructions": "The current record ID may be a Managed Event, not an account: always pass it as accountId. If the rep names an event, pass that event name as accountName, otherwise leave accountName blank. Pass the rep's message word for word as the question. Never ask which account. Do not create a new event."
   }
  ]
 }

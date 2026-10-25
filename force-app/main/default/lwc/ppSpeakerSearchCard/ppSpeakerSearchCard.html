@@ -15,7 +15,7 @@
                     <template for:each={candidates} for:item="c">
                         <li key={c.key} class="sp-item">
                             <div class="sp-top">
-                                <div><span class="sp-name">{c.name}</span><span class="sp-meta">{c.meta}</span></div>
+                                <div><template lwc:if={c.accountId}><a href="#" class="sp-name sp-anchor" data-id={c.accountId} onclick={handleOpenRecord}>{c.name}</a></template><template lwc:else><span class="sp-name">{c.name}</span></template><span class="sp-meta">{c.meta}</span></div>
                                 <span class={c.fitCls}>{c.fit} {c.score}</span>
                             </div>
                             <template lwc:if={c.why}><p class="sp-why">{c.why}</p></template>

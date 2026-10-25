@@ -1,5 +1,6 @@
 import { LightningElement, api } from 'lwc';
 import createTask from '@salesforce/apex/PPCardActionController.createTask';
+import { openRecord } from 'c/ppOpenRecord';
 import { NavigationMixin } from 'lightning/navigation';
 
 const TONES = ['positive', 'warning', 'critical', 'neutral'];
@@ -12,6 +13,7 @@ const tone = (t) => (TONES.includes(t) ? t : 'neutral');
  */
 export default class PpCardView extends NavigationMixin(LightningElement) {
     @api card;
+    @api mobile = false;
     @api rowStyle = 'table';
     @api iconName = 'standard:account';
 
@@ -63,6 +65,7 @@ export default class PpCardView extends NavigationMixin(LightningElement) {
         });
     }
 
+    goRecord(id) { this[NavigationMixin.Navigate]({ type: 'standard__recordPage', attributes: { recordId: id, actionName: 'view' } }); }
     handleAction(evt) { this.run(evt.currentTarget.dataset.key, (this.card.actions || [])[Number(evt.currentTarget.dataset.key.slice(1))]); }
     handleRowAction(evt) { this.run(evt.currentTarget.dataset.key, (this.card.rows || [])[Number(evt.currentTarget.dataset.key.slice(1))].action); }
 
@@ -73,7 +76,7 @@ export default class PpCardView extends NavigationMixin(LightningElement) {
                 await navigator.clipboard.writeText(action.text || '');
                 this.finish(key, 'Copied to clipboard.');
             } else if (action.kind === 'open') {
-                this[NavigationMixin.Navigate]({ type: 'standard__recordPage', attributes: { recordId: action.recordId, actionName: 'view' } });
+                openRecord((id) => this.goRecord(id), action.recordId, this.mobile);
                 this.finish(key, '');
             } else {
                 const escalate = action.kind === 'escalate';

@@ -59,3 +59,6 @@
 .ep-create { background: #0b5cab; color: #fff; border-color: #0b5cab; }
 .ep-create:disabled { background: #c9c7c5; border-color: #c9c7c5; }
 .sp-in { color: #0b6b2e; font-weight: 600; align-self: center; }
+
+.sp-anchor { color: #0b5cab; text-decoration: none; cursor: pointer; }
+.sp-anchor:hover { text-decoration: underline; }
