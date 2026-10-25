@@ -17,4 +17,5 @@ global class PPEventBrief {
     @AuraEnabled global List<PPEventPerson> colleagues;
     @AuraEnabled global Integer moreAttendees;
     @AuraEnabled global String nextStep;
+    @AuraEnabled global Boolean textOnly;
 }

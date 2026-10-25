@@ -35,7 +35,7 @@ start_agent agent_router:
     reasoning:
         instructions: |
             You are a router. Do NOT answer questions directly. Always use a transition action to route immediately.
-            - HIGHEST PRIORITY: any question about an EXISTING event or a person's event history that is not asking to pick a speaker: who is speaking, who is invited or attending, who accepted, declined or has not replied, who showed up or was a no-show at this or earlier events, which other events someone was invited to, how the budget or status looks, or summarize this event. Also when the rep is on an Account and asks which events they were invited to or attended Never when the rep asks to plan, propose or create a NEW event (plan a dinner in Chicago, propose a webinar), even if they are on an event record -> use go_to_event_insights
+            - HIGHEST PRIORITY and the DEFAULT for any question about an EXISTING event or about a person's events: summarize this event, who is speaking, who is invited, attending, accepted, declined or has not replied, who showed up or was a no-show, which other events someone was invited to, budget, expenses, products, dates, status, compliance, colleagues, or any other question about the event record or its attendees. Also when the rep is on an Account and asks which events they were invited to or attended. Never when the rep asks to plan, propose or create a NEW event (plan a dinner in Chicago, propose a webinar), even if they are on an event record. Never when the rep asks to recommend, find, add or replace a speaker -> use go_to_event_insights
             - HIGHEST PRIORITY: the rep asks to RECOMMEND, SUGGEST, FIND, SHORTLIST, ADD or REPLACE a speaker or presenter, or asks for alternative speakers, for example recommend a speaker for this event, who could speak at this event, add a speaker -> use go_to_speaker_search
             - Requests to plan, suggest or create a NEW event: speaker programs, dinners, webinars, advisory boards, plan a speaker program in Chicago. NEVER use for any question about a current, this or an existing event, its speakers, attendees or invitees, or a person's event history -> use go_to_event_planning
             - Any question about whether something can be said, off-label use, an unapproved claim, an adverse event, or "can I tell the doctor..." -> use go_to_compliance_check
@@ -44,7 +44,7 @@ start_agent agent_router:
             - Off-topic request unrelated to the rep's accounts and work -> use go_to_off_topic
         actions:
             go_to_event_insights: @utils.transition to @topic.event_insights
-                description: "Answer questions about an existing Managed Event the rep is on or names (its speakers, attendees and colleagues, each person's invitation and attendance history on earlier events, budget, status), or one HCP's event invitation history when the rep is on an account. Read only"
+                description: "Answer ANY question about an existing Managed Event the rep is on or names, using everything held about it (event fields, products, budget and expenses, speakers with their profiles, every attendee and colleague with invitation, response, attendance and earlier events), or one HCP's event invitation history when the rep is on an account. Read only. The prompt template decides how to answer"
             go_to_speaker_search: @utils.transition to @topic.speaker_search
                 description: "Recommend approved, qualified speakers for an existing Managed Event (the record the rep is on, an event the rep names, or their latest draft) with compliance checks and an add-as-speaker button. Only when the rep asks to recommend, find, add or replace a speaker. Not for questions about who is speaking, attendees, invitees, attendance or event history"
             go_to_event_planning: @utils.transition to @topic.event_planning
@@ -109,11 +109,11 @@ topic event_planning:
                 description: "Go back to ask about a different topic"
 
 topic event_insights:
-    description: "Answer questions about an existing Managed Event the rep is on or names (its speakers, attendees and colleagues, each person's invitation and attendance history on earlier events, budget, status), or one HCP's event invitation history when the rep is on an account. Read only"
+    description: "Answer ANY question about an existing Managed Event the rep is on or names, using everything held about it (event fields, products, budget and expenses, speakers with their profiles, every attendee and colleague with invitation, response, attendance and earlier events), or one HCP's event invitation history when the rep is on an account. Read only. The prompt template decides how to answer"
 
     actions:
         build_event_insights_card:
-            description: "Returns a brief of an existing event or a person's event history, answering the rep's question with real names, responses and attendance. Read only. The output is always renderable; always use show_command to display it."
+            description: "Loads all data for an existing event (or a person's event history) and answers the rep's question from it with real names, numbers, responses and attendance. Read only. The output is always renderable; always use show_command to display it."
             require_user_confirmation: False
             include_in_progress_indicator: True
             progress_indicator_message: "Building your Event Brief..."
@@ -150,7 +150,7 @@ topic event_insights:
 
         actions:
             build_event_insights: @actions.build_event_insights_card
-                description: "Returns a brief of an existing event or a person's event history, answering the rep's question with real names, responses and attendance. Read only."
+                description: "Loads all data for an existing event (or a person's event history) and answers the rep's question from it with real names, numbers, responses and attendance. Read only."
                 with question = ...
                 with accountId = @variables.currentRecordId
                 with accountName = ...

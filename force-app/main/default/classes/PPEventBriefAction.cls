@@ -7,6 +7,12 @@ global class PPEventBriefAction {
             PPEventBriefResult r = new PPEventBriefResult();
             r.card = PPEventBriefService.build('events', 'PP_Event_Brief', req);
             r.summary = r.card.headline != null ? r.card.headline : r.card.title;
+            if (r.card.textOnly == true) {
+                List<String> parts = new List<String>{ r.summary };
+                if (r.card.sections != null) for (PPSection s : r.card.sections) parts.addAll(s.bullets);
+                if (r.card.nextStep != null) parts.add(r.card.nextStep);
+                r.summary = String.join(parts, ' ');
+            }
             results.add(r);
         }
         return results;

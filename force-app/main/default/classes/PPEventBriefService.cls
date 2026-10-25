@@ -1,22 +1,24 @@
 /**
- * Event Brief: answers questions about an existing Managed Event (the record the rep is on, one they name, or their latest draft):
- * speakers, attendees, colleagues, budget, and each person's history on earlier events (invited, responded, attended, no-show).
- * With an Account record in context it shows that one person's event history instead. Everything is computed in Apex; the model only words the answer.
+ * Event assistant: loads everything about a Managed Event (fields, products, budget, expenses, every participant with their profile,
+ * invitation, response and attendance, and each person's earlier events) or about one person's event history, and hands it to the
+ * PP_Event_Brief prompt template together with the rep's question. The template decides what matters and shapes the answer
+ * (headline, metrics, sections, which people to show and what to say about them); Apex only fetches, flattens and links names back to records.
  */
 public with sharing class PPEventBriefService {
 
     private static final Set<String> DONE = new Set<String>{ 'Concluded', 'Closed' };
-    private static final Integer MAX_ATTENDEES = 30;
-    private static final Integer MAX_PAST = 6;
+    private static final Integer MAX_ROSTER = 150;
+    private static final Integer MAX_PAST = 8;
+    private static final Integer MAX_SHOWN = 40;
+    private static final Set<String> TONES = new Set<String>{ 'positive', 'warning', 'critical', 'neutral' };
 
     public static PPEventBrief build(String persona, String templateName, PPCardRequest req) {
         try {
             Account acct = personContext(req);
             PPSpeakerSearchService.EventCtx ctx = acct == null ? PPSpeakerSearchService.findEvent(req) : null;
             if (acct == null && ctx == null) return message('No event selected', 'Open an event record, or name the event. ' + PPSpeakerSearchService.openEvents());
-            PPEventBrief card = acct != null ? personCard(acct, req) : eventCard(ctx, req);
-            narrate(card, persona, templateName, req, ctx);
-            return card;
+            Dump d = acct != null ? personDump(acct) : eventDump(ctx);
+            return answer(d, persona, templateName, req);
         } catch (Exception e) {
             return message('Could not load the event', e.getMessage());
         }
@@ -38,32 +40,69 @@ public with sharing class PPEventBriefService {
         return [SELECT Id, Name FROM Account WHERE Id = :aid LIMIT 1];
     }
 
-    // ---------- event mode ----------
+    /** Everything loaded for the question: the text sent to the model plus the people, keyed by lower-case name, to link answers back to records. */
+    private class Dump {
+        String title;
+        String subtitle;
+        String eventId;
+        String eventName;
+        String status;
+        String eventText;
+        String rosterText;
+        Map<String, PPEventPerson> byName = new Map<String, PPEventPerson>();
+        List<PPEventPerson> all = new List<PPEventPerson>();
+    }
 
-    private static PPEventBrief eventCard(PPSpeakerSearchService.EventCtx ctx, PPCardRequest req) {
-        MngEvent ev = [SELECT Id, Name, Status, StartDateTime, EndDateTime, Mode, LocationType, EstimatedParticipantCount, EstimatedBudget,
+    // ---------- load: event ----------
+
+    private static Dump eventDump(PPSpeakerSearchService.EventCtx ctx) {
+        MngEvent ev = [SELECT Id, Name, Status, Description, StartDateTime, EndDateTime, Mode, LocationType, EstimatedParticipantCount, EstimatedBudget,
                               TotalEstimatedExpenseAmount, TotalActualExpenseAmount, ComplianceAgreementStatus, PrimaryOwner.Name, MngEventType.Name
                        FROM MngEvent WHERE Id = :ctx.ev.Id LIMIT 1];
-        String q = req.question;
-        String focus = focusOf(q);
+        Dump d = new Dump();
+        d.title = 'Event brief';
+        d.eventId = ev.Id;
+        d.eventName = ev.Name;
+        d.status = ev.Status;
+        d.subtitle = ev.Name + (ev.StartDateTime == null ? '' : ' - ' + ev.StartDateTime.format('yyyy-MM-dd')) + ' (' + ctx.source + ')';
+
+        List<String> e = new List<String>();
+        e.add('EVENT: ' + ev.Name + ' | status ' + ev.Status + ' | type ' + (ev.MngEventType == null ? '-' : ev.MngEventType.Name));
+        e.add('When: ' + (ev.StartDateTime == null ? 'not set' : ev.StartDateTime.format('yyyy-MM-dd HH:mm')) + (ev.EndDateTime == null ? '' : ' to ' + ev.EndDateTime.format('yyyy-MM-dd HH:mm')));
+        e.add('Format: ' + nz(ev.Mode) + ' | location type ' + nz(ev.LocationType) + ' | owner ' + (ev.PrimaryOwner == null ? '-' : ev.PrimaryOwner.Name));
+        e.add('Expected participants: ' + (ev.EstimatedParticipantCount == null ? 'not set' : String.valueOf(ev.EstimatedParticipantCount)));
+        e.add('Budget: ' + money(ev.EstimatedBudget) + ' | estimated expenses ' + money(ev.TotalEstimatedExpenseAmount) + ' | actual expenses ' + money(ev.TotalActualExpenseAmount));
+        e.add('Compliance agreement: ' + nz(ev.ComplianceAgreementStatus));
+        e.add('Products: ' + (ctx.products.isEmpty() ? 'none' : String.join(new List<String>(ctx.products), ', ')));
+        if (ev.Description != null) e.add('Description: ' + ev.Description.left(500));
+        try {
+            for (MngEventBudget b : [SELECT Name, Budget.Name, AllocatedAmount, TotalEstimatedExpenseAmount FROM MngEventBudget WHERE MngEventId = :ev.Id LIMIT 20]) {
+                e.add('Event budget (the Managed Event Budget record shown on the event): "' + b.Name + '" | allocated ' + money(b.AllocatedAmount) + ' | total estimated expenses ' + money(b.TotalEstimatedExpenseAmount) + ' | drawn from the funding budget "' + (b.Budget == null ? '-' : b.Budget.Name) + '"');
+            }
+            for (EstimatedExpense x : [SELECT Name, Amount, ExpenseType.Name FROM EstimatedExpense WHERE ExpenseSourceId = :ev.Id LIMIT 50]) {
+                e.add('Expense line: ' + x.Name + ' | ' + (x.ExpenseType == null ? '-' : x.ExpenseType.Name) + ' | ' + money(x.Amount));
+            }
+        } catch (Exception ex) { e.add('Budget and expense detail unavailable.'); }
+        d.eventText = String.join(e, '\n');
 
         List<MngEventParticipant> parts = [
-            SELECT Id, ParticipantId, Participant.Name, EventMgmtParticipantType.Name, EventMgmtParticipantRole.Name,
+            SELECT ParticipantId, Participant.Name, EventMgmtParticipantType.Name, EventMgmtParticipantRole.Name,
                    ParticipantResponse, AttendanceStatus, InvitationSentStatus
-            FROM MngEventParticipant WHERE MngEventId = :ev.Id ORDER BY Participant.Name LIMIT 500];
-
+            FROM MngEventParticipant WHERE MngEventId = :ev.Id ORDER BY Participant.Name LIMIT 1000];
         Set<Id> pids = new Set<Id>();
         for (MngEventParticipant p : parts) if (p.ParticipantId != null) pids.add(p.ParticipantId);
         Map<Id, List<PPEventPast>> hist = history(pids, ev.Id);
         Map<Id, Expert> experts = new Map<Id, Expert>([SELECT Id, Name, AccountId, AdditionalInformation FROM Expert WHERE Id IN :pids]);
         Map<Id, Integer> ytd = speakerYtd(experts.keySet(), ev.StartDateTime);
+        Map<Id, List<String>> subjects = new Map<Id, List<String>>();
+        for (ExpertSubject s : [SELECT ExpertId, Subject.Name, EffectiveDateTime, ExpirationDateTime FROM ExpertSubject WHERE ExpertId IN :experts.keySet()]) {
+            if (!subjects.containsKey(s.ExpertId)) subjects.put(s.ExpertId, new List<String>());
+            subjects.get(s.ExpertId).add(s.Subject.Name + (s.ExpirationDateTime == null ? '' : ' (expires ' + s.ExpirationDateTime.format('yyyy-MM-dd') + ')'));
+        }
 
-        List<PPEventPerson> speakers = new List<PPEventPerson>();
-        List<PPEventPerson> attendees = new List<PPEventPerson>();
-        List<PPEventPerson> colleagues = new List<PPEventPerson>();
-        Integer accepted = 0, declined = 0, noReply = 0, attendedNow = 0, noShowNow = 0, repeat = 0, riskNoShow = 0;
-        String lowerQ = nz(q).toLowerCase();
-
+        Map<String, Integer> tally = new Map<String, Integer>();
+        List<String> lines = new List<String>();
+        Integer n = 0;
         for (MngEventParticipant p : parts) {
             String type = p.EventMgmtParticipantType == null ? '' : nz(p.EventMgmtParticipantType.Name);
             PPEventPerson x = new PPEventPerson();
@@ -71,83 +110,190 @@ public with sharing class PPEventBriefService {
             x.role = p.EventMgmtParticipantRole == null ? null : p.EventMgmtParticipantRole.Name.replace('AFLS ', '').replace(' Attendee Role', '').replace(' Participant Role', '').replace(' Role', '');
             x.response = label(p.ParticipantResponse);
             x.attendance = label(p.AttendanceStatus);
-            x.highlight = x.name != null && nameMentioned(lowerQ, x.name);
             Id pid = p.ParticipantId;
             if (pid != null && pid.getSobjectType() == Account.SObjectType) x.accountId = pid;
             List<PPEventPast> past = pid != null && hist.containsKey(pid) ? hist.get(pid) : new List<PPEventPast>();
             summarize(x, past);
+            String profile = '';
             if (type.contains('Expert')) {
                 x.kind = 'Speaker';
-                Expert e = pid == null ? null : experts.get(pid);
-                if (e != null) {
-                    x.accountId = e.AccountId;
-                    Map<String, String> info = PPSpeakerSearchService.parse(e.AdditionalInformation);
+                Expert ex = pid == null ? null : experts.get(pid);
+                if (ex != null) {
+                    x.accountId = ex.AccountId;
+                    Map<String, String> info = PPSpeakerSearchService.parse(ex.AdditionalInformation);
                     x.specialty = info.get('SPECIALTY');
                     x.tier = info.containsKey('TIER') ? Integer.valueOf(info.get('TIER')) : null;
                     x.fee = info.containsKey('FEE') ? Decimal.valueOf(info.get('FEE')) : null;
                     x.trained = info.get('TRAINED');
-                    x.programsYtd = ytd.containsKey(e.Id) ? ytd.get(e.Id) : 0;
+                    x.programsYtd = ytd.containsKey(ex.Id) ? ytd.get(ex.Id) : 0;
                     x.notes = speakerNotes(x);
+                    profile = ' | profile: ' + nz(ex.AdditionalInformation).left(400) + (subjects.containsKey(ex.Id) ? ' | subjects: ' + String.join(subjects.get(ex.Id), ', ') : '')
+                        + ' | programs this year incl. this one ' + x.programsYtd + ' (annual cap ' + PPSpeakerSearchService.ANNUAL_CAP + ', fee review above $' + PPEventPlannerService.SPEAKER_FEE_CAP.setScale(0).format() + ')';
                 }
-                speakers.add(x);
             } else if (type.contains('Colleague')) {
                 x.kind = 'Colleague';
-                colleagues.add(x);
             } else {
                 x.kind = type.contains('WriteIn') ? 'Write-in' : (type.contains('NonProfiled') ? 'Non-profiled' : 'Attendee');
-                attendees.add(x);
-                if (p.ParticipantResponse == 'Accepted') accepted++;
-                else if (p.ParticipantResponse == 'Declined') declined++;
-                else noReply++;
-                if (p.AttendanceStatus == 'Attended' || p.AttendanceStatus == 'CheckInComplete') attendedNow++;
-                if (p.AttendanceStatus == 'NoShow') noShowNow++;
-                if (x.invited > 0) repeat++;
-                if (x.noShows > 0) riskNoShow++;
+            }
+            String key = x.kind + ' | response ' + nz(x.response) + ' | attendance ' + nz(x.attendance);
+            tally.put(key, (tally.containsKey(key) ? tally.get(key) : 0) + 1);
+            d.all.add(x);
+            if (x.name != null) d.byName.put(x.name.toLowerCase(), x);
+            if (n < MAX_ROSTER) {
+                lines.add('- ' + x.name + ' | ' + x.kind + (x.role == null ? '' : ' / ' + x.role) + ' | invitation ' + nz(label(p.InvitationSentStatus)) + ' | response ' + nz(x.response)
+                    + ' | attendance ' + nz(x.attendance) + profile + ' | earlier events: ' + earlier(x));
+            }
+            n++;
+        }
+        List<String> t = new List<String>{ 'ROSTER TOTALS (' + parts.size() + ' participants; counts by kind, response and attendance on THIS event):' };
+        List<String> keys = new List<String>(tally.keySet());
+        keys.sort();
+        for (String k : keys) t.add('  ' + k + ': ' + tally.get(k));
+        if (parts.isEmpty()) t.add('  Nobody is on this event yet.');
+        if (n > MAX_ROSTER) t.add('  Only the first ' + MAX_ROSTER + ' participants are listed below.');
+        d.rosterText = String.join(t, '\n') + '\nROSTER:\n' + (lines.isEmpty() ? 'none' : String.join(lines, '\n'));
+        return d;
+    }
+
+    /** "Name (date, status, outcome); ..." for the person's earlier events, or none. */
+    private static String earlier(PPEventPerson x) {
+        if (x.past == null || x.past.isEmpty()) return 'none';
+        List<String> l = new List<String>();
+        for (PPEventPast h : x.past) {
+            l.add(h.name + ' (' + nz(h.eventDate) + ', event ' + h.status + ', as ' + h.role + ', response ' + nz(h.response) + ', attendance ' + nz(h.attendance) + ')');
+        }
+        return String.join(l, '; ') + (x.invited > x.past.size() ? '; plus ' + (x.invited - x.past.size()) + ' older' : '');
+    }
+
+    // ---------- load: person ----------
+
+    private static Dump personDump(Account acct) {
+        Set<Id> pids = new Set<Id>{ acct.Id };
+        for (Expert e : [SELECT Id FROM Expert WHERE AccountId = :acct.Id]) pids.add(e.Id);
+        Map<Id, List<PPEventPast>> hist = history(pids, null);
+        List<PPEventPast> all = new List<PPEventPast>();
+        for (Id i : hist.keySet()) all.addAll(hist.get(i));
+        all.sort(new PastByDate());
+        PPEventPerson x = new PPEventPerson();
+        x.name = acct.Name;
+        x.accountId = acct.Id;
+        x.kind = 'Person';
+        x.highlight = true;
+        summarize(x, all);
+        List<PPEventPast> shown = new List<PPEventPast>();
+        for (PPEventPast p : all) if (shown.size() < 40) shown.add(p);
+        x.past = shown;
+        Dump d = new Dump();
+        d.title = 'Event history';
+        d.subtitle = acct.Name;
+        d.eventText = 'PERSON: ' + acct.Name + ' | ' + all.size() + ' events they were invited to (excluding drafts and cancelled)';
+        List<String> lines = new List<String>();
+        for (PPEventPast h : shown) {
+            lines.add('- ' + h.name + ' | ' + nz(h.eventDate) + ' | event ' + h.status + ' | as ' + h.role + ' | response ' + nz(h.response) + ' | attendance ' + nz(h.attendance));
+        }
+        d.rosterText = lines.isEmpty() ? 'No earlier events.' : 'EVENTS:\n' + String.join(lines, '\n');
+        d.all.add(x);
+        d.byName.put(acct.Name.toLowerCase(), x);
+        return d;
+    }
+
+    // ---------- answer: the prompt template decides, Apex links names to records ----------
+
+    private static PPEventBrief answer(Dump d, String persona, String templateName, PPCardRequest req) {
+        Map<String, String> inputs = new Map<String, String>{
+            'Question' => String.isNotBlank(req.question) ? req.question : 'Summarize this event.',
+            'Today' => Date.today().format() + ' (' + String.valueOf(Date.today()) + ')',
+            'EventContext' => d.eventText,
+            'Roster' => d.rosterText,
+            'ScenarioFacts' => PPContext.scenarioFacts(persona, null)
+        };
+        String body = PPViewRunner.runJson(templateName, inputs);
+        if (body != null) body = body.replace('&#124;', '-');
+        PPEventBrief c = new PPEventBrief();
+        c.title = d.title;
+        c.subtitle = d.subtitle;
+        c.eventId = d.eventId;
+        c.eventName = d.eventName;
+        c.badge = d.status;
+        c.badgeTone = 'neutral';
+        c.focus = 'overview';
+        c.metrics = new List<PPMetric>();
+        c.facts = new List<PPMetric>();
+        c.sections = new List<PPSection>();
+        c.speakers = new List<PPEventPerson>();
+        c.attendees = new List<PPEventPerson>();
+        c.colleagues = new List<PPEventPerson>();
+        if (body == null) {
+            c.headline = 'I could not put that answer together. Please ask again.';
+            return c;
+        }
+        Map<String, Object> m = (Map<String, Object>) JSON.deserializeUntyped(body);
+        if (m.get('title') != null) c.title = (String) m.get('title');
+        if (m.get('badge') != null) c.badge = (String) m.get('badge');
+        c.badgeTone = tone((String) m.get('badgeTone'));
+        if (m.get('focus') != null) c.focus = (String) m.get('focus');
+        c.headline = (String) m.get('headline');
+        c.nextStep = (String) m.get('nextStep');
+        c.textOnly = 'text' == (String) m.get('display');
+        c.metrics = metrics(m.get('metrics'));
+        c.facts = metrics(m.get('facts'));
+        if (m.get('sections') != null) {
+            for (Object o : (List<Object>) m.get('sections')) {
+                Map<String, Object> sm = (Map<String, Object>) o;
+                PPSection s = new PPSection();
+                s.heading = (String) sm.get('heading');
+                s.bullets = new List<String>();
+                if (sm.get('bullets') != null) for (Object b : (List<Object>) sm.get('bullets')) s.bullets.add(String.valueOf(b));
+                if (s.heading != null && !s.bullets.isEmpty()) c.sections.add(s);
             }
         }
-        sortAttendees(attendees, lowerQ);
-
-        PPEventBrief c = new PPEventBrief();
-        c.title = 'Event brief';
-        c.eventId = ev.Id;
-        c.eventName = ev.Name;
-        c.focus = focus;
-        c.subtitle = ev.Name + (ev.StartDateTime == null ? '' : ' - ' + ev.StartDateTime.format('yyyy-MM-dd')) + ' (' + ctx.source + ')';
-        c.badge = ev.Status;
-        c.badgeTone = ev.Status == 'Cancelled' ? 'critical' : (DONE.contains(ev.Status) ? 'neutral' : (ev.Status == 'Draft' || ev.Status == 'PendingApproval' ? 'warning' : 'positive'));
-
-        c.metrics = new List<PPMetric>{
-            metric('Speakers', String.valueOf(speakers.size()), speakers.isEmpty() ? 'warning' : 'positive'),
-            metric('Attendees', String.valueOf(attendees.size()) + (ev.EstimatedParticipantCount == null ? '' : ' of ' + ev.EstimatedParticipantCount), 'neutral'),
-            metric('Accepted', String.valueOf(accepted), 'positive'),
-            metric('No reply', String.valueOf(noReply), noReply > 0 ? 'warning' : 'neutral')
-        };
-        if (DONE.contains(ev.Status) || attendedNow > 0 || noShowNow > 0) {
-            c.metrics.add(metric('Attended', String.valueOf(attendedNow), 'positive'));
-            c.metrics.add(metric('No-shows', String.valueOf(noShowNow), noShowNow > 0 ? 'critical' : 'neutral'));
+        Integer shown = 0, skipped = 0;
+        if (m.get('people') != null) {
+            for (Object o : (List<Object>) m.get('people')) {
+                Map<String, Object> pm = (Map<String, Object>) o;
+                String nm = (String) pm.get('name');
+                PPEventPerson src = nm == null ? null : d.byName.get(nm.toLowerCase());
+                if (src == null) continue; // a name the data does not contain is dropped, never shown
+                if (shown >= MAX_SHOWN) { skipped++; continue; }
+                shown++;
+                PPEventPerson x = copy(src);
+                if (pm.get('note') != null) x.flag = (String) pm.get('note');
+                if (pm.get('tone') != null) x.tone = tone((String) pm.get('tone'));
+                x.highlight = pm.get('expand') == true;
+                if (x.kind == 'Speaker') c.speakers.add(x);
+                else if (x.kind == 'Colleague') c.colleagues.add(x);
+                else c.attendees.add(x);
+            }
         }
-        c.metrics.add(metric('Repeat invitees', String.valueOf(repeat), 'neutral'));
-        if (riskNoShow > 0) c.metrics.add(metric('Missed an earlier event', String.valueOf(riskNoShow), 'warning'));
-
-        c.facts = new List<PPMetric>();
-        c.facts.add(metric('Type', ev.MngEventType == null ? '-' : ev.MngEventType.Name, 'neutral'));
-        c.facts.add(metric('When', ev.StartDateTime == null ? '-' : ev.StartDateTime.format('EEE d MMM yyyy HH:mm') + (ev.EndDateTime == null ? '' : ' to ' + ev.EndDateTime.format('HH:mm')), 'neutral'));
-        c.facts.add(metric('Format', nz(ev.Mode) + (ev.LocationType == null ? '' : ' - ' + ev.LocationType), 'neutral'));
-        c.facts.add(metric('Owner', ev.PrimaryOwner == null ? '-' : ev.PrimaryOwner.Name, 'neutral'));
-        List<String> prods = new List<String>(ctx.products);
-        c.facts.add(metric('Products', prods.isEmpty() ? 'None' : String.join(prods, ', '), prods.isEmpty() ? 'warning' : 'neutral'));
-        c.facts.add(metric('Budget', money(ev.EstimatedBudget) + ' budget, ' + money(ev.TotalEstimatedExpenseAmount) + ' estimated, ' + money(ev.TotalActualExpenseAmount) + ' actual',
-            ev.TotalEstimatedExpenseAmount != null && ev.EstimatedBudget != null && ev.TotalEstimatedExpenseAmount > ev.EstimatedBudget ? 'critical' : 'neutral'));
-        c.facts.add(metric('Compliance agreement', nz(ev.ComplianceAgreementStatus), 'neutral'));
-
-        c.speakers = speakers;
-        c.colleagues = colleagues;
-        c.moreAttendees = attendees.size() > MAX_ATTENDEES ? attendees.size() - MAX_ATTENDEES : 0;
-        c.attendees = new List<PPEventPerson>();
-        for (PPEventPerson a : attendees) if (c.attendees.size() < MAX_ATTENDEES) c.attendees.add(a);
-        c.sections = new List<PPSection>();
+        c.moreAttendees = skipped;
         return c;
     }
+
+    private static PPEventPerson copy(PPEventPerson s) {
+        PPEventPerson x = new PPEventPerson();
+        x.name = s.name; x.accountId = s.accountId; x.kind = s.kind; x.role = s.role; x.response = s.response; x.attendance = s.attendance;
+        x.specialty = s.specialty; x.tier = s.tier; x.fee = s.fee; x.trained = s.trained; x.programsYtd = s.programsYtd;
+        x.invited = s.invited; x.completed = s.completed; x.attended = s.attended; x.noShows = s.noShows; x.lastAttended = s.lastAttended;
+        x.flag = s.flag; x.tone = s.tone; x.highlight = s.highlight; x.notes = s.notes; x.past = s.past;
+        return x;
+    }
+
+    private static List<PPMetric> metrics(Object o) {
+        List<PPMetric> out = new List<PPMetric>();
+        if (o == null) return out;
+        for (Object i : (List<Object>) o) {
+            Map<String, Object> mm = (Map<String, Object>) i;
+            if (mm.get('label') == null || mm.get('value') == null) continue;
+            PPMetric x = new PPMetric();
+            x.label = (String) mm.get('label');
+            x.value = String.valueOf(mm.get('value'));
+            x.tone = tone((String) mm.get('tone'));
+            out.add(x);
+        }
+        return out;
+    }
+
+    private static String tone(String t) { return t != null && TONES.contains(t) ? t : 'neutral'; }
 
     private static List<String> speakerNotes(PPEventPerson x) {
         List<String> n = new List<String>();
@@ -171,45 +317,6 @@ public with sharing class PPEventBriefService {
             out.put(p.ParticipantId, (out.containsKey(p.ParticipantId) ? out.get(p.ParticipantId) : 0) + 1);
         }
         return out;
-    }
-
-    // ---------- person mode ----------
-
-    private static PPEventBrief personCard(Account acct, PPCardRequest req) {
-        Set<Id> pids = new Set<Id>{ acct.Id };
-        for (Expert e : [SELECT Id FROM Expert WHERE AccountId = :acct.Id]) pids.add(e.Id);
-        Map<Id, List<PPEventPast>> hist = history(pids, null);
-        List<PPEventPast> all = new List<PPEventPast>();
-        for (Id i : hist.keySet()) all.addAll(hist.get(i));
-        all.sort(new PastByDate());
-
-        PPEventPerson x = new PPEventPerson();
-        x.name = acct.Name;
-        x.accountId = acct.Id;
-        x.kind = 'Person';
-        x.highlight = true;
-        summarize(x, all);
-        x.past = new List<PPEventPast>();
-        for (PPEventPast p : all) if (x.past.size() < 15) x.past.add(p);
-
-        PPEventBrief c = new PPEventBrief();
-        c.title = 'Event history';
-        c.subtitle = acct.Name;
-        c.focus = 'history';
-        c.badge = x.invited + ' events';
-        c.badgeTone = x.noShows > 0 ? 'warning' : 'neutral';
-        c.metrics = new List<PPMetric>{
-            metric('Invited to', String.valueOf(x.invited), 'neutral'),
-            metric('Attended', String.valueOf(x.attended), 'positive'),
-            metric('No-shows', String.valueOf(x.noShows), x.noShows > 0 ? 'critical' : 'neutral'),
-            metric('Events held', String.valueOf(x.completed), 'neutral')
-        };
-        c.attendees = new List<PPEventPerson>{ x };
-        c.speakers = new List<PPEventPerson>();
-        c.colleagues = new List<PPEventPerson>();
-        c.facts = new List<PPMetric>();
-        c.sections = new List<PPSection>();
-        return c;
     }
 
     // ---------- history ----------
@@ -268,67 +375,6 @@ public with sharing class PPEventBriefService {
         else { x.flag = 'Invited to ' + x.invited + ' earlier event' + (x.invited == 1 ? '' : 's') + ', no attendance recorded'; x.tone = 'neutral'; }
     }
 
-    private static void sortAttendees(List<PPEventPerson> l, String q) {
-        Boolean byMiss = has(q, new List<String>{ 'no-show', 'no show', 'noshow', 'missed', 'didn\'t show', 'did not show', 'unreliable', 'risk' });
-        Boolean byGood = has(q, new List<String>{ 'attended', 'reliable', 'engaged', 'regular', 'loyal', 'best' });
-        List<PPEventPerson> out = new List<PPEventPerson>();
-        for (Integer rank = 0; rank <= 3; rank++) {
-            for (PPEventPerson a : l) if (rankOf(a, byMiss, byGood) == rank) out.add(a);
-        }
-        l.clear();
-        l.addAll(out);
-    }
-
-    private static Integer rankOf(PPEventPerson a, Boolean byMiss, Boolean byGood) {
-        if (a.highlight == true) return 0;
-        if (byMiss) return a.noShows > 0 ? 1 : (a.invited > 0 ? 2 : 3);
-        if (byGood) return a.attended > 0 ? 1 : (a.invited > 0 ? 2 : 3);
-        return a.invited > 0 ? 1 : 2;
-    }
-
-    // ---------- narration ----------
-
-    private static void narrate(PPEventBrief card, String persona, String templateName, PPCardRequest req, PPSpeakerSearchService.EventCtx ctx) {
-        List<String> lines = new List<String>();
-        for (PPEventPerson x : people(card)) {
-            List<String> ev = new List<String>();
-            for (PPEventPast h : x.past == null ? new List<PPEventPast>() : x.past) {
-                if (ev.size() < 4) ev.add(h.name + ' (' + nz(h.eventDate) + ', ' + h.status + ', ' + nz(h.attendance) + (h.attendance == null ? nz(h.response) : '') + ')');
-            }
-            lines.add(x.name + ' | ' + x.kind + (x.role == null ? '' : ' / ' + x.role) + ' | response ' + nz(x.response) + ' | attendance ' + nz(x.attendance)
-                + ' | ' + nz(x.flag) + (ev.isEmpty() ? '' : ' | earlier: ' + String.join(ev, '; ')));
-        }
-        List<String> facts = new List<String>();
-        for (PPMetric m : card.facts == null ? new List<PPMetric>() : card.facts) facts.add(m.label + ': ' + m.value);
-        for (PPMetric m : card.metrics == null ? new List<PPMetric>() : card.metrics) facts.add(m.label + ' = ' + m.value);
-        Map<String, String> inputs = new Map<String, String>{
-            'Question' => String.isNotBlank(req.question) ? req.question : 'Summarize this event.',
-            'Today' => Date.today().format() + ' (' + String.valueOf(Date.today()) + ')',
-            'EventContext' => (card.eventName == null ? 'PERSON HISTORY: ' + card.subtitle : 'EVENT: ' + card.eventName + ' | status ' + card.badge) + '\n' + String.join(facts, '\n'),
-            'Roster' => lines.isEmpty() ? 'Nobody is on this event yet.' : String.join(lines, '\n'),
-            'ScenarioFacts' => PPContext.scenarioFacts(persona, null)
-        };
-        String body = PPViewRunner.runJson(templateName, inputs);
-        if (body == null) return;
-        Map<String, Object> m = (Map<String, Object>) JSON.deserializeUntyped(body);
-        card.headline = (String) m.get('headline');
-        card.nextStep = (String) m.get('nextStep');
-        if (m.get('insights') != null) {
-            for (Object o : (List<Object>) m.get('insights')) {
-                Map<String, Object> im = (Map<String, Object>) o;
-                if (im.get('title') != null && im.get('detail') != null) card.sections.add(PPViewRunner.section((String) im.get('title'), (String) im.get('detail')));
-            }
-        }
-    }
-
-    private static List<PPEventPerson> people(PPEventBrief c) {
-        List<PPEventPerson> l = new List<PPEventPerson>();
-        if (c.speakers != null) l.addAll(c.speakers);
-        if (c.attendees != null) l.addAll(c.attendees);
-        if (c.colleagues != null) l.addAll(c.colleagues);
-        return l;
-    }
-
     // ---------- shared with Speaker Search ----------
 
     /** One summary line per speaker already on the event, for the "already has a speaker" answer. Empty when there is none. */
@@ -365,29 +411,6 @@ public with sharing class PPEventBriefService {
 
     // ---------- helpers ----------
 
-    @TestVisible
-    private static String focusOf(String q) {
-        String s = nz(q).toLowerCase();
-        Boolean attendeeWords = has(s, new List<String>{ 'attendee', 'invitee', 'invited', 'invite', 'guest', 'coming', 'rsvp', 'accepted', 'declined', 'responded', 'audience', 'colleague', 'who is on', 'participant' });
-        if (has(s, new List<String>{ 'budget', 'cost', 'spend', 'expense', 'money', 'afford' })) return 'budget';
-        if (has(s, new List<String>{ 'speaker', 'presenter', 'faculty', 'presenting', 'speaking' }) && !attendeeWords) return 'speakers';
-        if (has(s, new List<String>{ 'previous', 'earlier', 'other event', 'past event', 'before', 'history', 'no-show', 'no show', 'show up', 'showed', 'attend', 'missed', 'repeat', 'regular', 'track record' })) return 'history';
-        if (attendeeWords) return 'attendees';
-        return 'overview';
-    }
-
-    private static Boolean has(String s, List<String> words) {
-        for (String w : words) if (s.contains(w)) return true;
-        return false;
-    }
-
-    private static Boolean nameMentioned(String lowerQ, String name) {
-        String n = name.toLowerCase();
-        if (lowerQ.contains(n)) return true;
-        List<String> parts = n.split(' ');
-        return parts.size() > 1 && parts[parts.size() - 1].length() >= 4 && lowerQ.contains(parts[parts.size() - 1]);
-    }
-
     /** "Sarah Verma Advisory Faculty Profile" -> "Sarah Verma". */
     private static String clean(String n) {
         if (n == null) return null;
@@ -398,14 +421,6 @@ public with sharing class PPEventBriefService {
     private static String label(String v) {
         if (v == null) return null;
         return v.replaceAll('([a-z])([A-Z])', '$1 $2').replace('No Response', 'No response').replace('No Show', 'No show').replace('Check In Complete', 'Check in complete').replace('Sign Up Complete', 'Signed up');
-    }
-
-    private static PPMetric metric(String label, String value, String tone) {
-        PPMetric m = new PPMetric();
-        m.label = label;
-        m.value = value;
-        m.tone = tone;
-        return m;
     }
 
     private static String money(Decimal d) { return d == null ? '$0' : '$' + d.setScale(0).format(); }

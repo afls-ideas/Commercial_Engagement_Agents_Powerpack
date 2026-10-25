@@ -42,7 +42,8 @@ export default class PpEventBriefCard extends NavigationMixin(LightningElement) 
         if (typeof v === 'string') { try { return JSON.parse(v); } catch (e) { return null; } }
         return v;
     }
-    get hasCard() { return !!this.card; }
+    get hasCard() { return !!this.card && this.card.textOnly !== true; }
+    get isTextOnly() { return !!this.card && this.card.textOnly === true; }
     get badgeClass() { return `pp-badge pp-tone-${this.card.badgeTone || 'neutral'}`; }
     get metrics() {
         return ((this.card && this.card.metrics) || []).map((m, i) => ({ ...m, key: `m${i}`, cls: `pp-metric pp-tone-${m.tone || 'neutral'}` }));

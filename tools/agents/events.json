@@ -33,9 +33,9 @@
  "extra_topics": [
   {
    "topic": "event_insights",
-   "router": "HIGHEST PRIORITY: any question about an EXISTING event or a person's event history that is not asking to pick a speaker: who is speaking, who is invited or attending, who accepted, declined or has not replied, who showed up or was a no-show at this or earlier events, which other events someone was invited to, how the budget or status looks, or summarize this event. Also when the rep is on an Account and asks which events they were invited to or attended Never when the rep asks to plan, propose or create a NEW event (plan a dinner in Chicago, propose a webinar), even if they are on an event record",
-   "desc": "Answer questions about an existing Managed Event the rep is on or names (its speakers, attendees and colleagues, each person's invitation and attendance history on earlier events, budget, status), or one HCP's event invitation history when the rep is on an account. Read only",
-   "action_desc": "Returns a brief of an existing event or a person's event history, answering the rep's question with real names, responses and attendance. Read only.",
+   "router": "HIGHEST PRIORITY and the DEFAULT for any question about an EXISTING event or about a person's events: summarize this event, who is speaking, who is invited, attending, accepted, declined or has not replied, who showed up or was a no-show, which other events someone was invited to, budget, expenses, products, dates, status, compliance, colleagues, or any other question about the event record or its attendees. Also when the rep is on an Account and asks which events they were invited to or attended. Never when the rep asks to plan, propose or create a NEW event (plan a dinner in Chicago, propose a webinar), even if they are on an event record. Never when the rep asks to recommend, find, add or replace a speaker",
+   "desc": "Answer ANY question about an existing Managed Event the rep is on or names, using everything held about it (event fields, products, budget and expenses, speakers with their profiles, every attendee and colleague with invitation, response, attendance and earlier events), or one HCP's event invitation history when the rep is on an account. Read only. The prompt template decides how to answer",
+   "action_desc": "Loads all data for an existing event (or a person's event history) and answers the rep's question from it with real names, numbers, responses and attendance. Read only.",
    "class": "PPEventBriefAction",
    "clt": "ppEventBrief",
    "card_label": "Event Brief",
