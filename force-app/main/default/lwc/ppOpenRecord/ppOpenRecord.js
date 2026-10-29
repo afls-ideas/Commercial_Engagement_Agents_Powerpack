@@ -15,6 +15,7 @@ export function openRecord(navigate, recordId, mobile) {
     const onHide = () => { left = true; };
     window.addEventListener('pagehide', onHide, { once: true });
     document.addEventListener('visibilitychange', onHide, { once: true });
+    window.addEventListener('blur', onHide, { once: true });
     try {
         window.location.href = `lsc://deeplink/lightning/r/${obj}/${recordId}/view`;
     } catch (e) {
@@ -25,6 +26,7 @@ export function openRecord(navigate, recordId, mobile) {
     setTimeout(() => {
         window.removeEventListener('pagehide', onHide);
         document.removeEventListener('visibilitychange', onHide);
+        window.removeEventListener('blur', onHide);
         if (!left) navigate(recordId);
     }, 1200);
 }

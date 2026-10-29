@@ -101,6 +101,7 @@ export default class PpEventBriefCard extends NavigationMixin(LightningElement) 
         const cur = evt.target.dataset.open === 'true';
         this.openMap = { ...this.openMap, [key]: !cur };
     }
+    goRecord(id) { this[NavigationMixin.Navigate]({ type: 'standard__recordPage', attributes: { recordId: id, actionName: 'view' } }); }
     handleOpen() {
         openRecord((id) => this.goRecord(id), this.card.eventId, this.isMobile);
     }
